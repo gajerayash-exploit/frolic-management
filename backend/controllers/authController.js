@@ -137,14 +137,30 @@ export const register = async (req, res) => {
             });
         }
 
-        // Create user (always as student role, not admin)
+        // Determine role based on email for testing/live purposes
+        const lowerEmail = EmailAddress.toLowerCase();
+        let role = 'student';
+        let isAdmin = false;
+
+        if (lowerEmail === 'admin@frolic.com') {
+            role = 'admin';
+            isAdmin = true;
+        } else if (lowerEmail.includes('inst.coord')) {
+            role = 'institute_coordinator';
+        } else if (lowerEmail.includes('dept.coord')) {
+            role = 'department_coordinator';
+        } else if (lowerEmail.includes('evt.coord')) {
+            role = 'event_coordinator';
+        }
+
+        // Create user
         const user = await User.create({
             UserName,
-            EmailAddress: EmailAddress.toLowerCase(),
+            EmailAddress: lowerEmail,
             UserPassword,
             PhoneNumber,
-            Role: 'student',
-            IsAdmin: false
+            Role: role,
+            IsAdmin: isAdmin
         });
 
         // Generate token
