@@ -7,7 +7,7 @@ import { initApiClient } from './config/api.js'
 import { initAppearance } from './utils/initAppearance.js'
 import './index.css'
 
-// Apply saved appearance preferences (theme, accent, font) before first paint
+// Apply saved appearance preferences (theme, font size) before first paint
 initAppearance()
 initApiClient()
 

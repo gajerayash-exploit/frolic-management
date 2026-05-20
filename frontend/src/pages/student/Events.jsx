@@ -70,7 +70,7 @@ export default function StudentEvents() {
         setRegisterLoading(true)
 
         try {
-            const token = localStorage.getItem('token')
+            const token = localStorage.getItem('frolic_token')
             const res = await fetch('/api/groups', {
                 method: 'POST',
                 headers: {

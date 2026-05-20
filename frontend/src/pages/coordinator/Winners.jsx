@@ -67,7 +67,7 @@ export default function CoordinatorWinners() {
         e.preventDefault()
         setFormError('')
         try {
-            const token = localStorage.getItem('token')
+            const token = localStorage.getItem('frolic_token')
             const res = await fetch('/api/winners', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -89,7 +89,7 @@ export default function CoordinatorWinners() {
     const handleDelete = async (id) => {
         if (!confirm('Remove this winner declaration?')) return
         try {
-            const token = localStorage.getItem('token')
+            const token = localStorage.getItem('frolic_token')
             await fetch(`/api/winners/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
@@ -174,21 +174,21 @@ export default function CoordinatorWinners() {
                             <form onSubmit={handleDeclare} className="space-y-4">
                                 <div>
                                     <label className="block text-sm text-white/60 mb-1">Event</label>
-                                    <select value={form.EventID} onChange={(e) => handleEventChange(e.target.value)} required className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500">
+                                    <select value={form.EventID} onChange={(e) => handleEventChange(e.target.value)} required className="w-full px-4 py-2 bg-midnight-900 border border-white/20 rounded-xl text-white focus:outline-none focus:border-emerald-500 [&>option]:bg-midnight-900 [&>option]:text-white">
                                         <option value="">Select Event</option>
                                         {myEvents.map(ev => <option key={ev._id} value={ev._id}>{ev.EventName}</option>)}
                                     </select>
                                 </div>
                                 <div>
                                     <label className="block text-sm text-white/60 mb-1">Group</label>
-                                    <select value={form.GroupID} onChange={(e) => setForm({ ...form, GroupID: e.target.value })} required className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500">
+                                    <select value={form.GroupID} onChange={(e) => setForm({ ...form, GroupID: e.target.value })} required className="w-full px-4 py-2 bg-midnight-900 border border-white/20 rounded-xl text-white focus:outline-none focus:border-emerald-500 [&>option]:bg-midnight-900 [&>option]:text-white">
                                         <option value="">Select Group</option>
                                         {eventGroups.map(g => <option key={g._id} value={g._id}>{g.GroupName}</option>)}
                                     </select>
                                 </div>
                                 <div>
                                     <label className="block text-sm text-white/60 mb-1">Position</label>
-                                    <select value={form.Sequence} onChange={(e) => setForm({ ...form, Sequence: e.target.value })} required className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500">
+                                    <select value={form.Sequence} onChange={(e) => setForm({ ...form, Sequence: e.target.value })} required className="w-full px-4 py-2 bg-midnight-900 border border-white/20 rounded-xl text-white focus:outline-none focus:border-emerald-500 [&>option]:bg-midnight-900 [&>option]:text-white">
                                         <option value="1">1st Place</option>
                                         <option value="2">2nd Place</option>
                                         <option value="3">3rd Place</option>

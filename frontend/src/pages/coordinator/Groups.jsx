@@ -66,7 +66,7 @@ export default function CoordinatorGroups() {
 
     const handleUpdateStatus = async (groupId, field, value) => {
         try {
-            const token = localStorage.getItem('token')
+            const token = localStorage.getItem('frolic_token')
             const res = await fetch(`/api/groups/${groupId}`, {
                 method: 'PUT',
                 headers: {

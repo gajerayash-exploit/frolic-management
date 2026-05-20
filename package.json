@@ -1,0 +1,15 @@
+{
+  "name": "frolic-management",
+  "version": "1.0.0",
+  "description": "Frolic Management System - Full Stack Application",
+  "scripts": {
+    "dev": "echo Starting Frolic Management... && cd backend && start cmd /k npm run dev && cd ../frontend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "install:all": "cd backend && npm install && cd ../frontend && npm install",
+    "build": "cd frontend && npm run build"
+  },
+  "keywords": ["frolic", "event-management", "university"],
+  "author": "Frolic Team",
+  "license": "MIT"
+}

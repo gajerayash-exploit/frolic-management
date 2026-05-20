@@ -230,7 +230,7 @@ export default function Departments() {
                     <select
                         value={filterInstitute}
                         onChange={(e) => setFilterInstitute(e.target.value)}
-                        className="pl-12 pr-8 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-accent-500/50 appearance-none cursor-pointer min-w-[200px]"
+                        className="pl-12 pr-8 py-3 bg-midnight-900 border border-white/20 rounded-xl text-white focus:outline-none focus:border-accent-500 appearance-none cursor-pointer min-w-[200px] [&>option]:bg-midnight-900 [&>option]:text-white"
                     >
                         <option value="">All Institutes</option>
                         {institutes.map(inst => (
@@ -364,7 +364,7 @@ export default function Departments() {
                                     <select
                                         value={formData.InstituteID}
                                         onChange={(e) => setFormData({ ...formData, InstituteID: e.target.value })}
-                                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-accent-500/50"
+                                        className="w-full px-4 py-3 bg-midnight-900 border border-white/20 rounded-xl text-white focus:outline-none focus:border-accent-500 [&>option]:bg-midnight-900 [&>option]:text-white"
                                         required
                                     >
                                         <option value="">Select Institute</option>

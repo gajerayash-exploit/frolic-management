@@ -14,14 +14,6 @@ const THEMES = [
     { id: 'auto',  icon: HiOutlineDesktopComputer, label: 'System',     desc: 'Match OS setting' },
 ]
 
-const ACCENTS = [
-    { id: 'purple',  color: 'bg-purple-500',  ring: 'ring-purple-400',  hsl: '270, 70%, 60%',  hslGlow: '270, 70%, 50%' },
-    { id: 'blue',    color: 'bg-blue-500',    ring: 'ring-blue-400',    hsl: '217, 91%, 60%',  hslGlow: '217, 91%, 50%' },
-    { id: 'cyan',    color: 'bg-cyan-500',    ring: 'ring-cyan-400',    hsl: '188, 86%, 53%',  hslGlow: '188, 86%, 43%' },
-    { id: 'emerald', color: 'bg-emerald-500', ring: 'ring-emerald-400', hsl: '160, 84%, 39%',  hslGlow: '160, 84%, 30%' },
-    { id: 'rose',    color: 'bg-rose-500',    ring: 'ring-rose-400',    hsl: '350, 89%, 60%',  hslGlow: '350, 89%, 50%' },
-    { id: 'amber',   color: 'bg-amber-500',   ring: 'ring-amber-400',  hsl: '38, 92%, 50%',   hslGlow: '38, 92%, 40%' },
-]
 
 const FONT_SIZES = [
     { id: 'small',  label: 'Small',  px: '14px', sampleClass: 'text-xs' },
@@ -29,14 +21,6 @@ const FONT_SIZES = [
     { id: 'large',  label: 'Large',  px: '18px', sampleClass: 'text-base' },
 ]
 
-// ─── Apply accent color as CSS custom properties on :root ────────
-function applyAccent(accentId) {
-    const accent = ACCENTS.find(a => a.id === accentId) || ACCENTS[0]
-    const root = document.documentElement
-    root.style.setProperty('--accent-color', `hsl(${accent.hsl})`)
-    root.style.setProperty('--accent-glow', `hsl(${accent.hslGlow})`)
-    root.style.setProperty('--accent-hsl', accent.hsl)
-}
 
 // ─── Apply font size to <html> element ───────────────────────────
 function applyFontSize(sizeId) {
@@ -63,7 +47,7 @@ function applyTheme(themeId) {
 // ═════════════════════════════════════════════════════════════════
 export default function AppearancePanel() {
     const [theme, setTheme] = useState(() => localStorage.getItem('frolic_theme') || 'dark')
-    const [accentColor, setAccentColor] = useState(() => localStorage.getItem('frolic_accent') || 'purple')
+
     const [fontSize, setFontSize] = useState(() => localStorage.getItem('frolic_fontsize') || 'medium')
     const [showSaved, setShowSaved] = useState('')
 
@@ -73,11 +57,6 @@ export default function AppearancePanel() {
         applyTheme(theme)
     }, [theme])
 
-    // Apply accent on change
-    useEffect(() => {
-        localStorage.setItem('frolic_accent', accentColor)
-        applyAccent(accentColor)
-    }, [accentColor])
 
     // Apply font size on change
     useEffect(() => {
@@ -147,54 +126,6 @@ export default function AppearancePanel() {
                 )}
             </SettingSection>
 
-            {/* Accent Color */}
-            <SettingSection title="Accent Color" description="Personalize the interface highlight color">
-                <div className="glass-card p-6">
-                    <div className="flex flex-wrap gap-4">
-                        {ACCENTS.map((a) => (
-                            <button
-                                key={a.id}
-                                id={`accent-${a.id}`}
-                                onClick={() => { setAccentColor(a.id); flashSaved('accent') }}
-                                className={`w-11 h-11 rounded-full ${a.color} transition-all duration-300 flex items-center justify-center ${
-                                    accentColor === a.id
-                                        ? `ring-2 ${a.ring} ring-offset-2 ring-offset-midnight-950 scale-110`
-                                        : 'opacity-60 hover:opacity-100 hover:scale-105'
-                                }`}
-                                title={a.id.charAt(0).toUpperCase() + a.id.slice(1)}
-                            >
-                                {accentColor === a.id && (
-                                    <HiOutlineCheck className="w-5 h-5 text-white drop-shadow" />
-                                )}
-                            </button>
-                        ))}
-                    </div>
-
-                    {/* Live preview swatch */}
-                    <div className="mt-5 flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/10">
-                        <div
-                            className="w-8 h-8 rounded-lg shrink-0"
-                            style={{ backgroundColor: `var(--accent-color, hsl(270, 70%, 60%))` }}
-                        />
-                        <div>
-                            <p className="text-sm text-white font-medium">
-                                {accentColor.charAt(0).toUpperCase() + accentColor.slice(1)}
-                            </p>
-                            <p className="text-xs text-white/40">Active accent — applied across the interface</p>
-                        </div>
-                    </div>
-
-                    {showSaved === 'accent' && (
-                        <motion.p
-                            initial={{ opacity: 0, y: -5 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="text-xs text-emerald-400 mt-3 flex items-center gap-1"
-                        >
-                            <HiOutlineCheck className="w-3.5 h-3.5" /> Accent color applied
-                        </motion.p>
-                    )}
-                </div>
-            </SettingSection>
 
             {/* Font Size */}
             <SettingSection title="Font Size" description="Adjust the base text size for readability">

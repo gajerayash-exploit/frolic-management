@@ -33,7 +33,7 @@ export default function AdminGroups() {
 
     const handleUpdateStatus = async (groupId, field, value) => {
         try {
-            const token = localStorage.getItem('token')
+            const token = localStorage.getItem('frolic_token')
             const res = await fetch(`/api/groups/${groupId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },

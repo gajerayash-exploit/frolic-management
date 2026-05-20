@@ -118,7 +118,7 @@ export default function CoordinatorEvents() {
         e.preventDefault()
         setSubmitLoading(true)
         try {
-            const token = localStorage.getItem('token')
+            const token = localStorage.getItem('frolic_token')
             const res = await fetch('/api/events', {
                 method: 'POST',
                 headers: {

@@ -12,10 +12,15 @@ import {
     HiOutlineSearch,
     HiOutlineFilter
 } from 'react-icons/hi'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import StudentEvents from './Events'
 import StudentMyGroups from './MyGroups'
 import StudentResults from './Results'
+
+// Chart components
+import MiniStatCard from '../../components/charts/MiniStatCard'
+import GroupParticipationChart from '../../components/charts/GroupParticipationChart'
+import useDashboardData from '../../hooks/useDashboardData'
 
 const sidebarItems = [
     { path: '/student', icon: HiOutlineHome, label: 'Dashboard', exact: true },
@@ -148,146 +153,117 @@ function TopBar({ setIsOpen, onLogout }) {
     )
 }
 
-// Student Dashboard Home
+// Student Dashboard Home — Premium SaaS Analytics
 function DashboardHome() {
     const { user } = useAuth()
-    const [stats, setStats] = useState({ registeredEvents: 0, myGroups: 0, achievements: 0 })
+    const { stats, charts, loading } = useDashboardData('student', user?._id)
     const [upcomingEvents, setUpcomingEvents] = useState([])
-    const [loading, setLoading] = useState(true)
 
+    // Fetch upcoming events separately for the list section
     useEffect(() => {
-        const fetchDashboardData = async () => {
+        const fetchRecent = async () => {
             try {
-                // Fetch user's groups
-                const groupsRes = await fetch('/api/groups')
-                const groupsData = await groupsRes.json()
-                const myGroups = (groupsData.data || []).filter(g => 
-                    (g.CreatedBy?._id || g.CreatedBy) === user?._id
-                )
-                
-                // Fetch achievements (winners)
-                const winRes = await fetch('/api/winners')
-                const winData = await winRes.json()
-                const myGroupIds = myGroups.map(g => g._id)
-                const myAchievements = (winData.data || []).filter(w => 
-                    myGroupIds.includes(w.GroupID?._id || w.GroupID)
-                )
-
-                // Fetch events
-                const eventsRes = await fetch('/api/events')
-                const eventsData = await eventsRes.json()
-                const activeEvents = (eventsData.data || []).filter(e => e.IsActive).slice(0, 4)
-
-                setStats({
-                    registeredEvents: myGroups.length, // Proxy for events registered
-                    myGroups: myGroups.length,
-                    achievements: myAchievements.length
-                })
-
+                const res = await fetch('/api/events')
+                const data = await res.json()
+                const activeEvents = (data.data || []).filter(e => e.IsActive).slice(0, 4)
                 setUpcomingEvents(activeEvents)
-            } catch (error) {
-                console.error('Error fetching dashboard data:', error)
-            } finally {
-                setLoading(false)
+            } catch (e) {
+                console.error('Upcoming events fetch error:', e)
             }
         }
+        fetchRecent()
+    }, [])
 
-        if (user?._id) {
-            fetchDashboardData()
-        }
-    }, [user])
+    // Sparkline data for stat cards
+    const grpSparkline = (charts.groupParticipation || []).map(d => d.teams)
 
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="text-2xl font-bold text-white mb-2">Welcome Back! 👋</h1>
-                <p className="text-white/60">Explore events and manage your groups</p>
-            </div>
-
-            {/* Stats */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="glass-card-hover p-6"
-                >
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mb-4">
-                        <HiOutlineCalendar className="w-6 h-6 text-white" />
-                    </div>
-                    <p className="text-3xl font-bold text-white mb-1">
-                        {loading ? <span className="animate-pulse w-8 h-8 bg-white/10 rounded block"></span> : stats.registeredEvents}
-                    </p>
-                    <p className="text-sm text-white/60">Registered Events</p>
-                </motion.div>
-
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="glass-card-hover p-6"
-                >
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center mb-4">
-                        <HiOutlineUserGroup className="w-6 h-6 text-white" />
-                    </div>
-                    <p className="text-3xl font-bold text-white mb-1">
-                        {loading ? <span className="animate-pulse w-8 h-8 bg-white/10 rounded block"></span> : stats.myGroups}
-                    </p>
-                    <p className="text-sm text-white/60">My Groups</p>
-                </motion.div>
-
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="glass-card-hover p-6"
-                >
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center mb-4">
-                        <HiOutlineStar className="w-6 h-6 text-white" />
-                    </div>
-                    <p className="text-3xl font-bold text-white mb-1">
-                        {loading ? <span className="animate-pulse w-8 h-8 bg-white/10 rounded block"></span> : stats.achievements}
-                    </p>
-                    <p className="text-sm text-white/60">Achievements</p>
-                </motion.div>
-            </div>
-
-            {/* Upcoming Events */}
-            <div className="glass-card p-6">
-                <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-white">Upcoming Events</h3>
-                    <Link to="/student/events" className="text-sm text-blue-400 hover:text-blue-300">
-                        View All →
-                    </Link>
+            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
+                <div>
+                    <h1 className="text-2xl font-bold text-white mb-1">Welcome Back! 👋</h1>
+                    <p className="text-white/50 text-sm">Explore events and manage your groups</p>
                 </div>
-                <div className="space-y-3">
-                    {loading ? (
-                        <div className="animate-pulse space-y-3">
-                            {[1, 2, 3].map(i => (
-                                <div key={i} className="h-16 bg-white/5 rounded-xl"></div>
-                            ))}
-                        </div>
-                    ) : upcomingEvents.length === 0 ? (
-                        <p className="text-white/60 text-center py-4">No upcoming events right now.</p>
-                    ) : upcomingEvents.map((event, i) => (
-                        <motion.div
-                            key={event._id}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: i * 0.1 }}
-                            className="flex items-center justify-between p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
-                        >
-                            <div>
-                                <p className="text-white font-medium">{event.EventName}</p>
-                                <p className="text-sm text-white/40">{event.DepartmentID?.DepartmentName || 'TBD'}</p>
+            </div>
+
+            {/* ─── Stat Cards ──────────────────────────────────────── */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <MiniStatCard
+                    label="Registered Events"
+                    value={loading ? '...' : stats.registeredEvents}
+                    gradient="from-blue-500 to-cyan-500"
+                    icon={<HiOutlineCalendar className="w-5 h-5 text-white" />}
+                    delay={0}
+                    loading={loading}
+                    sparkData={grpSparkline}
+                />
+                <MiniStatCard
+                    label="My Groups"
+                    value={loading ? '...' : stats.myGroups}
+                    gradient="from-emerald-500 to-teal-500"
+                    icon={<HiOutlineUserGroup className="w-5 h-5 text-white" />}
+                    delay={0.1}
+                    loading={loading}
+                />
+                <MiniStatCard
+                    label="Achievements"
+                    value={loading ? '...' : stats.achievements}
+                    gradient="from-amber-500 to-orange-500"
+                    icon={<HiOutlineStar className="w-5 h-5 text-white" />}
+                    delay={0.2}
+                    loading={loading}
+                    badge={stats.achievements > 0 ? "Winner!" : null}
+                    badgeColor="amber"
+                />
+            </div>
+
+            {/* ─── My Activity Chart & Events List ─────────────────── */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2">
+                    <GroupParticipationChart
+                        data={charts.groupParticipation}
+                        delay={0.3}
+                    />
+                </div>
+
+                {/* Upcoming Events List */}
+                <div className="glass-card p-6 h-[300px] flex flex-col">
+                    <div className="flex items-center justify-between mb-4 shrink-0">
+                        <h3 className="text-lg font-semibold text-white">Upcoming Events</h3>
+                        <Link to="/student/events" className="text-sm text-blue-400 hover:text-blue-300">
+                            View All →
+                        </Link>
+                    </div>
+                    <div className="space-y-3 overflow-y-auto pr-2 scrollbar-hide flex-1">
+                        {loading ? (
+                            <div className="animate-pulse space-y-3">
+                                {[1, 2, 3].map(i => (
+                                    <div key={i} className="h-16 bg-white/5 rounded-xl"></div>
+                                ))}
                             </div>
-                            <div className="text-right">
-                                <p className="text-sm text-white/60">{event.EventDate ? new Date(event.EventDate).toLocaleDateString() : 'TBD'}</p>
-                                <span className="text-xs px-2 py-1 rounded-full bg-blue-500/20 text-blue-400">
-                                    Open
-                                </span>
-                            </div>
-                        </motion.div>
-                    ))}
+                        ) : upcomingEvents.length === 0 ? (
+                            <p className="text-white/60 text-center py-4">No upcoming events right now.</p>
+                        ) : upcomingEvents.map((event, i) => (
+                            <motion.div
+                                key={event._id}
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: i * 0.1 }}
+                                className="flex items-center justify-between p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
+                            >
+                                <div>
+                                    <p className="text-white font-medium line-clamp-1">{event.EventName}</p>
+                                    <p className="text-xs text-white/40">{event.DepartmentID?.DepartmentName || 'TBD'}</p>
+                                </div>
+                                <div className="text-right shrink-0 ml-2">
+                                    <p className="text-xs text-white/60 mb-1">{event.EventDate ? new Date(event.EventDate).toLocaleDateString() : 'TBD'}</p>
+                                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400">
+                                        Open
+                                    </span>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
                 </div>
             </div>
         </div>
@@ -317,13 +293,13 @@ export default function StudentDashboard() {
     }
 
     return (
-        <div className="min-h-screen bg-midnight-950 lg:flex">
+        <div className="h-screen bg-midnight-950 lg:flex overflow-hidden">
             <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
 
-            <div className="flex-1 flex flex-col min-h-screen">
+            <div className="flex-1 flex flex-col h-screen overflow-hidden">
                 <TopBar setIsOpen={setSidebarOpen} onLogout={handleLogout} />
 
-                <main className="flex-1 p-4 lg:p-6 overflow-auto">
+                <main className="flex-1 p-4 lg:p-6 overflow-y-auto">
                     <Routes>
                         <Route index element={<DashboardHome />} />
                         <Route path="events/*" element={<StudentEvents />} />

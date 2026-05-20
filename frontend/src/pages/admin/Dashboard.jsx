@@ -13,9 +13,12 @@ import {
     HiOutlineLogout,
     HiOutlineMenu,
     HiOutlineX,
-    HiOutlineSparkles
+    HiOutlineSparkles,
+    HiOutlineCash,
+    HiOutlineTrendingUp,
+    HiOutlineChartBar
 } from 'react-icons/hi'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Institutes from './Institutes'
 import Departments from './Departments'
 import Events from './Events'
@@ -23,6 +26,16 @@ import Users from './Users'
 import Groups from './Groups'
 import Winners from './Winners'
 import Settings from './settings'
+
+// Chart components
+import MiniStatCard from '../../components/charts/MiniStatCard'
+import RegistrationTrendChart from '../../components/charts/RegistrationTrendChart'
+import EventStatusChart from '../../components/charts/EventStatusChart'
+import DepartmentDistributionChart from '../../components/charts/DepartmentDistributionChart'
+import PaymentStatusChart from '../../components/charts/PaymentStatusChart'
+import AttendanceChart from '../../components/charts/AttendanceChart'
+import InstituteActivityChart from '../../components/charts/InstituteActivityChart'
+import useDashboardData from '../../hooks/useDashboardData'
 
 const sidebarItems = [
     { path: '/admin', icon: HiOutlineHome, label: 'Dashboard', exact: true },
@@ -160,42 +173,174 @@ function TopBar({ setIsOpen, onLogout }) {
     )
 }
 
-// Dashboard Home Component
+// RelativeTime Component for live updating timestamps
+function RelativeTime({ dateString }) {
+    const [timeStr, setTimeStr] = useState('');
+
+    useEffect(() => {
+        const updateTime = () => {
+            if (!dateString) return;
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffInSeconds = Math.floor((now - date) / 1000);
+
+            if (diffInSeconds < 60) setTimeStr('Just now');
+            else if (diffInSeconds < 3600) setTimeStr(`${Math.floor(diffInSeconds / 60)}m ago`);
+            else if (diffInSeconds < 86400) setTimeStr(`${Math.floor(diffInSeconds / 3600)}h ago`);
+            else if (diffInSeconds < 604800) setTimeStr(`${Math.floor(diffInSeconds / 86400)}d ago`);
+            else setTimeStr(date.toLocaleDateString());
+        };
+
+        updateTime();
+        const interval = setInterval(updateTime, 60000);
+        return () => clearInterval(interval);
+    }, [dateString]);
+
+    return <span>{timeStr}</span>;
+}
+
+// Dashboard Home Component — Premium SaaS Analytics
 function DashboardHome() {
-    const stats = [
-        { label: 'Total Events', value: '12', gradient: 'from-blue-500 to-cyan-500' },
-        { label: 'Active Groups', value: '48', gradient: 'from-emerald-500 to-teal-500' },
-        { label: 'Participants', value: '256', gradient: 'from-orange-500 to-amber-500' },
-        { label: 'Institutes', value: '8', gradient: 'from-purple-500 to-pink-500' },
-    ]
+    const { stats, charts, loading } = useDashboardData('admin')
+    const [recentEvents, setRecentEvents] = useState([])
+
+    // Fetch recent events separately for the list section
+    useEffect(() => {
+        const fetchRecent = async () => {
+            try {
+                const res = await fetch('/api/events')
+                const data = await res.json()
+                setRecentEvents((data.data || []).slice(-4).reverse())
+            } catch (e) {
+                console.error('Recent events fetch error:', e)
+            }
+        }
+        fetchRecent()
+    }, [])
+
+    // Sparkline data for stat cards (derived from chart trend data)
+    const regSparkline = (charts.registrationTrend || []).map(d => d.registrations)
+    const grpSparkline = (charts.groupParticipation || []).map(d => d.teams)
 
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="text-2xl font-bold text-white mb-2">Dashboard Overview</h1>
-                <p className="text-white/60">Welcome to Frolic Management System</p>
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
+                <div>
+                    <h1 className="text-2xl font-bold text-white mb-1">Dashboard Overview</h1>
+                    <p className="text-white/50 text-sm">
+                        Welcome to Frolic Management System —{' '}
+                        {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                    </p>
+                </div>
+                <div className="flex items-center gap-2">
+                    <span className="text-xs text-white/30">Last synced just now</span>
+                    <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                </div>
             </div>
 
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {stats.map((stat, index) => (
-                    <motion.div
-                        key={stat.label}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                        className="glass-card-hover p-6"
-                    >
-                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center mb-4`}>
-                            <span className="text-2xl font-bold text-white">{stat.value.charAt(0)}</span>
-                        </div>
-                        <p className="text-3xl font-bold text-white mb-1">{stat.value}</p>
-                        <p className="text-sm text-white/60">{stat.label}</p>
-                    </motion.div>
-                ))}
+            {/* ─── Stat Cards Row ─────────────────────────────────── */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+                <MiniStatCard
+                    label="Total Events"
+                    value={loading ? '...' : stats.totalEvents}
+                    gradient="from-blue-500 to-cyan-500"
+                    icon={<HiOutlineCalendar className="w-5 h-5 text-white" />}
+                    delay={0}
+                    loading={loading}
+                    badge={stats.activeEvents ? `${stats.activeEvents} active` : null}
+                    badgeColor="emerald"
+                    sparkData={regSparkline}
+                />
+                <MiniStatCard
+                    label="Active Events"
+                    value={loading ? '...' : stats.upcomingEvents}
+                    gradient="from-emerald-500 to-teal-500"
+                    icon={<HiOutlineTrendingUp className="w-5 h-5 text-white" />}
+                    delay={0.05}
+                    loading={loading}
+                    badge="Upcoming"
+                    badgeColor="blue"
+                />
+                <MiniStatCard
+                    label="Total Groups"
+                    value={loading ? '...' : stats.totalGroups}
+                    gradient="from-purple-500 to-pink-500"
+                    icon={<HiOutlineUserGroup className="w-5 h-5 text-white" />}
+                    delay={0.1}
+                    loading={loading}
+                    sparkData={grpSparkline}
+                />
+                <MiniStatCard
+                    label="Total Users"
+                    value={loading ? '...' : stats.totalUsers}
+                    gradient="from-orange-500 to-amber-500"
+                    icon={<HiOutlineUsers className="w-5 h-5 text-white" />}
+                    delay={0.15}
+                    loading={loading}
+                />
+                <MiniStatCard
+                    label="Revenue Collected"
+                    value={loading ? '...' : `₹${stats.collectedRevenue?.toLocaleString() || 0}`}
+                    gradient="from-teal-500 to-cyan-500"
+                    icon={<HiOutlineCash className="w-5 h-5 text-white" />}
+                    delay={0.2}
+                    loading={loading}
+                    badge={stats.paymentRate ? `${stats.paymentRate}%` : null}
+                    badgeColor={stats.paymentRate >= 70 ? 'emerald' : 'amber'}
+                />
+                <MiniStatCard
+                    label="Winners Declared"
+                    value={loading ? '...' : stats.winnersDecl}
+                    gradient="from-amber-500 to-orange-500"
+                    icon={<HiOutlineStar className="w-5 h-5 text-white" />}
+                    delay={0.25}
+                    loading={loading}
+                    badge={stats.winnersPending ? `${stats.winnersPending} pending` : null}
+                    badgeColor="amber"
+                />
             </div>
 
-            {/* Quick Actions */}
+            {/* ─── Charts Row 1: Registration Trend + Event Status ─ */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <RegistrationTrendChart
+                    data={charts.registrationTrend}
+                    delay={0.3}
+                />
+                <EventStatusChart
+                    data={charts.eventStatus}
+                    total={stats.totalEvents}
+                    delay={0.35}
+                />
+            </div>
+
+            {/* ─── Charts Row 2: Department + Payment ──────────── */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <DepartmentDistributionChart
+                    data={charts.departmentDistribution}
+                    delay={0.4}
+                />
+                <PaymentStatusChart
+                    data={charts.paymentStatus}
+                    rate={stats.paymentRate || 0}
+                    delay={0.45}
+                />
+            </div>
+
+            {/* ─── Charts Row 3: Attendance + Institute Activity ── */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <AttendanceChart
+                    data={charts.attendanceData}
+                    rate={stats.attendanceRate || 0}
+                    delay={0.5}
+                />
+                <InstituteActivityChart
+                    data={charts.instituteActivity}
+                    delay={0.55}
+                />
+            </div>
+
+            {/* ─── Quick Actions ─────────────────────────────────── */}
             <div className="glass-card p-6">
                 <h3 className="text-lg font-semibold text-white mb-4">Quick Actions</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -214,22 +359,38 @@ function DashboardHome() {
                 </div>
             </div>
 
-            {/* Recent Activity Placeholder */}
+            {/* ─── Recent Events ─────────────────────────────────── */}
             <div className="glass-card p-6">
-                <h3 className="text-lg font-semibold text-white mb-4">Recent Activity</h3>
+                <h3 className="text-lg font-semibold text-white mb-4">Recent Events</h3>
                 <div className="space-y-4">
-                    {[1, 2, 3].map((i) => (
-                        <div key={i} className="flex items-center gap-4 p-4 rounded-xl bg-white/5">
-                            <div className="w-10 h-10 rounded-full bg-accent-500/20 flex items-center justify-center">
-                                <HiOutlineCalendar className="w-5 h-5 text-accent-400" />
+                    {loading ? (
+                        [1, 2, 3].map((i) => (
+                            <div key={i} className="flex items-center gap-4 p-4 rounded-xl bg-white/5 animate-pulse">
+                                <div className="w-10 h-10 rounded-full bg-white/10" />
+                                <div className="flex-1 space-y-2">
+                                    <div className="h-4 bg-white/10 rounded w-1/3" />
+                                    <div className="h-3 bg-white/10 rounded w-1/4" />
+                                </div>
                             </div>
-                            <div className="flex-1">
-                                <p className="text-white font-medium">New event registered</p>
-                                <p className="text-sm text-white/40">Code Sprint - Computer Science</p>
+                        ))
+                    ) : recentEvents.length === 0 ? (
+                        <p className="text-white/40 text-center py-4">No events yet. Create your first event!</p>
+                    ) : (
+                        recentEvents.map((event) => (
+                            <div key={event._id} className="flex items-center gap-4 p-4 rounded-xl bg-white/5 hover:bg-white/[0.07] transition-colors">
+                                <div className="w-10 h-10 rounded-full bg-accent-500/20 flex items-center justify-center">
+                                    <HiOutlineCalendar className="w-5 h-5 text-accent-400" />
+                                </div>
+                                <div className="flex-1">
+                                    <p className="text-white font-medium">{event.EventName}</p>
+                                    <p className="text-sm text-white/40">{event.DepartmentID?.DepartmentName || 'No Department'}</p>
+                                </div>
+                                <p className="text-xs text-white/40">
+                                    <RelativeTime dateString={event.createdAt} />
+                                </p>
                             </div>
-                            <p className="text-xs text-white/40">2 hours ago</p>
-                        </div>
-                    ))}
+                        ))
+                    )}
                 </div>
             </div>
         </div>
@@ -260,13 +421,13 @@ export default function AdminDashboard() {
     }
 
     return (
-        <div className="min-h-screen bg-midnight-950 lg:flex">
+        <div className="h-screen bg-midnight-950 lg:flex overflow-hidden">
             <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
 
-            <div className="flex-1 flex flex-col min-h-screen">
+            <div className="flex-1 flex flex-col h-screen overflow-hidden">
                 <TopBar setIsOpen={setSidebarOpen} onLogout={handleLogout} />
 
-                <main className="flex-1 p-4 lg:p-6 overflow-auto">
+                <main className="flex-1 p-4 lg:p-6 overflow-y-auto">
                     <Routes>
                         <Route index element={<DashboardHome />} />
                         <Route path="institutes/*" element={<Institutes />} />

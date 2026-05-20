@@ -8,7 +8,9 @@ import {
     HiOutlineStar,
     HiOutlineLogout,
     HiOutlineMenu,
-    HiOutlineSparkles
+    HiOutlineSparkles,
+    HiOutlineUserGroup,
+    HiOutlineCash
 } from 'react-icons/hi'
 import { useState, useEffect } from 'react'
 
@@ -19,6 +21,13 @@ import DepartmentView from './DepartmentView'
 import EventView from './EventView'
 import CoordinatorGroups from './Groups'
 import CoordinatorWinners from './Winners'
+
+// Chart components
+import MiniStatCard from '../../components/charts/MiniStatCard'
+import AttendanceChart from '../../components/charts/AttendanceChart'
+import PaymentStatusChart from '../../components/charts/PaymentStatusChart'
+import GroupParticipationChart from '../../components/charts/GroupParticipationChart'
+import useDashboardData from '../../hooks/useDashboardData'
 
 const sidebarItems = [
     { path: '/coordinator', icon: HiOutlineHome, label: 'Dashboard', exact: true },
@@ -155,42 +164,10 @@ function TopBar({ setIsOpen, onLogout }) {
 }
 
 // Coordinator Dashboard Home
+// Coordinator Dashboard Home — Premium SaaS Analytics
 function DashboardHome() {
     const { user } = useAuth()
-    const [stats, setStats] = useState({ myEvents: 0, totalGroups: 0, paymentsDone: 0, pending: 0 })
-    const [loading, setLoading] = useState(true)
-
-    useEffect(() => {
-        const fetchDashboardData = async () => {
-            try {
-                // Fetch events
-                const eventsRes = await fetch('/api/events')
-                const eventsData = await eventsRes.json()
-                const myEvents = eventsData.data || []
-
-                // Fetch groups
-                const groupsRes = await fetch('/api/groups')
-                const groupsData = await groupsRes.json()
-                const allGroups = groupsData.data || []
-
-                const paymentsDone = allGroups.filter(g => g.IsPaymentDone).length
-                const pending = allGroups.filter(g => !g.IsPaymentDone).length
-
-                setStats({
-                    myEvents: myEvents.length,
-                    totalGroups: allGroups.length,
-                    paymentsDone,
-                    pending
-                })
-            } catch (error) {
-                console.error('Error fetching coordinator dashboard data:', error)
-            } finally {
-                setLoading(false)
-            }
-        }
-
-        fetchDashboardData()
-    }, [])
+    const { stats, charts, loading } = useDashboardData('coordinator')
 
     // Choose specific view based on role
     if (user?.role === 'institute_coordinator') {
@@ -203,61 +180,78 @@ function DashboardHome() {
         return <EventView />
     }
 
+    // Sparkline data for stat cards
+    const grpSparkline = (charts.groupParticipation || []).map(d => d.teams)
+
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="text-2xl font-bold text-white mb-2">Coordinator Dashboard</h1>
-                <p className="text-white/60">Manage your assigned events</p>
+            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
+                <div>
+                    <h1 className="text-2xl font-bold text-white mb-1">Coordinator Dashboard</h1>
+                    <p className="text-white/50 text-sm">Manage and track your assigned events</p>
+                </div>
             </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="glass-card-hover p-6"
-                >
-                    <p className="text-3xl font-bold text-white mb-1">
-                        {loading ? <span className="animate-pulse w-8 h-8 bg-white/10 rounded block"></span> : stats.myEvents}
-                    </p>
-                    <p className="text-sm text-white/60">My Events</p>
-                </motion.div>
+            {/* ─── Stat Cards ──────────────────────────────────────── */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <MiniStatCard
+                    label="Active Events"
+                    value={loading ? '...' : stats.activeEvents}
+                    gradient="from-blue-500 to-cyan-500"
+                    icon={<HiOutlineCalendar className="w-5 h-5 text-white" />}
+                    delay={0}
+                    loading={loading}
+                />
+                <MiniStatCard
+                    label="Total Groups"
+                    value={loading ? '...' : stats.totalGroups}
+                    gradient="from-emerald-500 to-teal-500"
+                    icon={<HiOutlineUserGroup className="w-5 h-5 text-white" />}
+                    delay={0.1}
+                    loading={loading}
+                    sparkData={grpSparkline}
+                />
+                <MiniStatCard
+                    label="Payments Verified"
+                    value={loading ? '...' : stats.paidGroups}
+                    gradient="from-purple-500 to-pink-500"
+                    icon={<HiOutlineCash className="w-5 h-5 text-white" />}
+                    delay={0.2}
+                    loading={loading}
+                    badge={stats.paymentRate ? `${stats.paymentRate}% rate` : null}
+                    badgeColor={stats.paymentRate >= 70 ? 'emerald' : 'amber'}
+                />
+                <MiniStatCard
+                    label="Pending Payments"
+                    value={loading ? '...' : stats.pendingPayments}
+                    gradient="from-amber-500 to-orange-500"
+                    icon={<HiOutlineClipboardCheck className="w-5 h-5 text-white" />}
+                    delay={0.3}
+                    loading={loading}
+                    badge={stats.pendingPayments > 0 ? "Action Needed" : "All Clear"}
+                    badgeColor={stats.pendingPayments > 0 ? "rose" : "emerald"}
+                />
+            </div>
 
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="glass-card-hover p-6"
-                >
-                    <p className="text-3xl font-bold text-white mb-1">
-                        {loading ? <span className="animate-pulse w-8 h-8 bg-white/10 rounded block"></span> : stats.totalGroups}
-                    </p>
-                    <p className="text-sm text-white/60">Total Groups</p>
-                </motion.div>
+            {/* ─── Charts ──────────────────────────────────────────── */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <AttendanceChart
+                    data={charts.attendanceData}
+                    rate={stats.attendanceRate || 0}
+                    delay={0.4}
+                />
+                <PaymentStatusChart
+                    data={charts.paymentStatus}
+                    rate={stats.paymentRate || 0}
+                    delay={0.45}
+                />
+            </div>
 
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="glass-card-hover p-6"
-                >
-                    <p className="text-3xl font-bold text-emerald-400 mb-1">
-                        {loading ? <span className="animate-pulse w-8 h-8 bg-white/10 rounded block"></span> : stats.paymentsDone}
-                    </p>
-                    <p className="text-sm text-white/60">Payments Done</p>
-                </motion.div>
-
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="glass-card-hover p-6"
-                >
-                    <p className="text-3xl font-bold text-amber-400 mb-1">
-                        {loading ? <span className="animate-pulse w-8 h-8 bg-white/10 rounded block"></span> : stats.pending}
-                    </p>
-                    <p className="text-sm text-white/60">Pending</p>
-                </motion.div>
+            <div className="grid grid-cols-1 gap-4">
+                <GroupParticipationChart
+                    data={charts.groupParticipation}
+                    delay={0.5}
+                />
             </div>
 
             <p className="text-white/40 text-center mt-10">Select a specific role to see a customized dashboard.</p>
@@ -288,13 +282,13 @@ export default function CoordinatorDashboard() {
     }
 
     return (
-        <div className="min-h-screen bg-midnight-950 lg:flex">
+        <div className="h-screen bg-midnight-950 lg:flex overflow-hidden">
             <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
 
-            <div className="flex-1 flex flex-col min-h-screen">
+            <div className="flex-1 flex flex-col h-screen overflow-hidden">
                 <TopBar setIsOpen={setSidebarOpen} onLogout={handleLogout} />
 
-                <main className="flex-1 p-4 lg:p-6 overflow-auto">
+                <main className="flex-1 p-4 lg:p-6 overflow-y-auto">
                     <Routes>
                         <Route index element={<DashboardHome />} />
                         <Route path="events/*" element={<CoordinatorEvents />} />

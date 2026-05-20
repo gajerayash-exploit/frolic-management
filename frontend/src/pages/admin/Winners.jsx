@@ -52,7 +52,7 @@ export default function AdminWinners() {
         e.preventDefault()
         setFormError('')
         try {
-            const token = localStorage.getItem('token')
+            const token = localStorage.getItem('frolic_token')
             const res = await fetch('/api/winners', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -74,7 +74,7 @@ export default function AdminWinners() {
     const handleDelete = async (id) => {
         if (!confirm('Remove this winner declaration?')) return
         try {
-            const token = localStorage.getItem('token')
+            const token = localStorage.getItem('frolic_token')
             await fetch(`/api/winners/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
@@ -186,7 +186,7 @@ export default function AdminWinners() {
                                         value={form.EventID}
                                         onChange={(e) => handleEventChange(e.target.value)}
                                         required
-                                        className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-accent-500"
+                                        className="w-full px-4 py-2 bg-midnight-900 border border-white/20 rounded-xl text-white focus:outline-none focus:border-accent-500 [&>option]:bg-midnight-900 [&>option]:text-white"
                                     >
                                         <option value="">Select Event</option>
                                         {events.map(ev => <option key={ev._id} value={ev._id}>{ev.EventName}</option>)}
@@ -198,7 +198,7 @@ export default function AdminWinners() {
                                         value={form.GroupID}
                                         onChange={(e) => setForm({ ...form, GroupID: e.target.value })}
                                         required
-                                        className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-accent-500"
+                                        className="w-full px-4 py-2 bg-midnight-900 border border-white/20 rounded-xl text-white focus:outline-none focus:border-accent-500 [&>option]:bg-midnight-900 [&>option]:text-white"
                                     >
                                         <option value="">Select Group</option>
                                         {eventGroups.map(g => <option key={g._id} value={g._id}>{g.GroupName}</option>)}
@@ -210,7 +210,7 @@ export default function AdminWinners() {
                                         value={form.Sequence}
                                         onChange={(e) => setForm({ ...form, Sequence: e.target.value })}
                                         required
-                                        className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-accent-500"
+                                        className="w-full px-4 py-2 bg-midnight-900 border border-white/20 rounded-xl text-white focus:outline-none focus:border-accent-500 [&>option]:bg-midnight-900 [&>option]:text-white"
                                     >
                                         <option value="1">1st Place</option>
                                         <option value="2">2nd Place</option>
