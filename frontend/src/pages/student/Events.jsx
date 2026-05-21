@@ -399,6 +399,25 @@ export default function StudentEvents() {
 
     const handleRegister = async (e) => {
         e.preventDefault()
+        setRegisterError('')
+
+        // Pre-check: validate group name uniqueness before proceeding
+        try {
+            const res = await fetch('/api/groups')
+            const data = await res.json()
+            const existingGroups = data.data || []
+            const duplicate = existingGroups.find(g =>
+                g.GroupName.toLowerCase() === groupName.trim().toLowerCase() &&
+                (g.EventID?._id || g.EventID) === selectedEvent._id
+            )
+            if (duplicate) {
+                setRegisterError(`Group name "${groupName}" is already taken for this event. Please choose a different name.`)
+                return
+            }
+        } catch (err) {
+            // If pre-check fails, let the backend handle it
+        }
+
         // If the event has fees, show mock payment gateway first
         if (selectedEvent.Fees > 0) {
             setShowPayment(true)
