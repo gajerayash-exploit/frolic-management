@@ -97,6 +97,7 @@ export default function useDashboardData(role = 'admin', userId = null) {
                 instituteActivity: computeInstituteActivity(institutes, departments, events),
                 resultPublication: computeResultPublication(events, eventIdsWithWinners),
                 groupParticipation: computeGroupParticipation(groups),
+                revenueTrend: computeRevenueTrend(groups, events),
             }
 
             setData({ stats, charts, loading: false, error: null })
@@ -265,6 +266,41 @@ function computeGroupParticipation(groups) {
     const result = Object.values(months)
     result.forEach(m => {
         cum += m.teams
+        m.cumulative = cum
+    })
+
+    return result
+}
+
+function computeRevenueTrend(groups, events) {
+    const months = {}
+    const now = new Date()
+
+    for (let i = 5; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+        const label = d.toLocaleDateString('en-US', { month: 'short', year: '2-digit' })
+        months[key] = { month: label, revenue: 0, payments: 0 }
+    }
+
+    const paidGroups = groups.filter(g => g.IsPaymentDone)
+    paidGroups.forEach(g => {
+        const dateField = g.PaymentVerifiedAt || g.createdAt
+        if (!dateField) return
+        const d = new Date(dateField)
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+        if (months[key]) {
+            const evt = events.find(e => (e._id === (g.EventID?._id || g.EventID)))
+            months[key].revenue += (evt?.Fees || 0)
+            months[key].payments += 1
+        }
+    })
+
+    // Cumulative revenue
+    let cum = 0
+    const result = Object.values(months)
+    result.forEach(m => {
+        cum += m.revenue
         m.cumulative = cum
     })
 

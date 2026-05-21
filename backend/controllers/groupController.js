@@ -7,7 +7,7 @@ import Participant from '../models/Participant.js';
 // @access  Public
 export const registerGroup = async (req, res) => {
     try {
-        const { GroupName, EventID, Participants } = req.body;
+        const { GroupName, EventID, Participants, IsPaymentDone } = req.body;
 
         // 1. Verify Event
         const event = await Event.findById(EventID);
@@ -42,7 +42,10 @@ export const registerGroup = async (req, res) => {
         const group = await Group.create({
             GroupName,
             EventID,
-            CreatedBy: req.user._id
+            CreatedBy: req.user._id,
+            IsPaymentDone: IsPaymentDone || false,
+            PaymentVerifiedBy: IsPaymentDone ? req.user._id : null,
+            PaymentVerifiedAt: IsPaymentDone ? Date.now() : null
         });
 
         // 5. Create Participants

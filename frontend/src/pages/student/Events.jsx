@@ -10,9 +10,302 @@ import {
     HiOutlineClock,
     HiOutlineX,
     HiOutlinePlus,
-    HiOutlineTrash
+    HiOutlineTrash,
+    HiOutlineCreditCard,
+    HiOutlineShieldCheck,
+    HiOutlineCheckCircle,
+    HiOutlineLightningBolt
 } from 'react-icons/hi'
 
+// ─── Mock Payment Gateway Component ─────────────────────────────
+function MockPaymentGateway({ amount, eventName, onSuccess, onCancel }) {
+    const [payMethod, setPayMethod] = useState('card') // 'card' | 'upi'
+    const [processing, setProcessing] = useState(false)
+    const [success, setSuccess] = useState(false)
+    const [card, setCard] = useState({ number: '', expiry: '', cvv: '', name: '' })
+    const [upiId, setUpiId] = useState('')
+
+    const fillTestCard = () => {
+        setCard({ number: '4242 4242 4242 4242', expiry: '12/28', cvv: '123', name: 'Test Student' })
+    }
+
+    const fillTestUpi = () => {
+        setUpiId('teststudent@upi')
+    }
+
+    const formatCardNumber = (val) => {
+        const digits = val.replace(/\D/g, '').slice(0, 16)
+        return digits.replace(/(\d{4})(?=\d)/g, '$1 ')
+    }
+
+    const formatExpiry = (val) => {
+        const digits = val.replace(/\D/g, '').slice(0, 4)
+        if (digits.length >= 3) return digits.slice(0, 2) + '/' + digits.slice(2)
+        return digits
+    }
+
+    const canSubmit = payMethod === 'card'
+        ? card.number.replace(/\s/g, '').length === 16 && card.expiry.length >= 4 && card.cvv.length === 3 && card.name.trim()
+        : upiId.includes('@')
+
+    const handlePay = () => {
+        if (!canSubmit) return
+        setProcessing(true)
+        // Simulate processing delay
+        setTimeout(() => {
+            setProcessing(false)
+            setSuccess(true)
+            // After showing success, call onSuccess
+            setTimeout(() => {
+                onSuccess()
+            }, 1800)
+        }, 2500)
+    }
+
+    return (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-md z-[60] flex items-center justify-center p-4">
+            <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 30 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 30 }}
+                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                className="w-full max-w-md"
+            >
+                {/* Success Screen */}
+                {success ? (
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="bg-gradient-to-br from-emerald-900/90 to-teal-900/90 border border-emerald-500/30 rounded-3xl p-8 text-center backdrop-blur-xl"
+                    >
+                        <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ type: 'spring', damping: 10, stiffness: 200, delay: 0.2 }}
+                        >
+                            <HiOutlineCheckCircle className="w-20 h-20 text-emerald-400 mx-auto mb-4" />
+                        </motion.div>
+                        <motion.h3
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.4 }}
+                            className="text-2xl font-bold text-white mb-2"
+                        >
+                            Payment Successful!
+                        </motion.h3>
+                        <motion.p
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.6 }}
+                            className="text-emerald-300 text-sm"
+                        >
+                            ₹{amount} paid for {eventName}
+                        </motion.p>
+                        <motion.p
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.8 }}
+                            className="text-white/50 text-xs mt-2"
+                        >
+                            Completing registration...
+                        </motion.p>
+                    </motion.div>
+                ) : (
+                    /* Payment Form */
+                    <div className="bg-gradient-to-br from-midnight-950 to-[#0f172a] border border-white/10 rounded-3xl overflow-hidden shadow-2xl shadow-black/50">
+                        {/* Header */}
+                        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-5">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                                        <HiOutlineShieldCheck className="w-5 h-5 text-white" />
+                                    </div>
+                                    <div>
+                                        <p className="text-white/70 text-xs font-medium">FROLIC PAY</p>
+                                        <p className="text-white font-bold text-lg">₹{amount}</p>
+                                    </div>
+                                </div>
+                                <button onClick={onCancel} className="text-white/60 hover:text-white transition-colors p-1">
+                                    <HiOutlineX className="w-5 h-5" />
+                                </button>
+                            </div>
+                            <p className="text-white/60 text-xs mt-2">Registration fee for {eventName}</p>
+                        </div>
+
+                        <div className="p-6 space-y-5">
+                            {/* Method Toggle */}
+                            <div className="flex bg-white/5 rounded-xl p-1 gap-1">
+                                <button
+                                    onClick={() => setPayMethod('card')}
+                                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                                        payMethod === 'card'
+                                            ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg shadow-indigo-500/25'
+                                            : 'text-white/50 hover:text-white/80'
+                                    }`}
+                                >
+                                    <HiOutlineCreditCard className="w-4 h-4" />
+                                    Credit Card
+                                </button>
+                                <button
+                                    onClick={() => setPayMethod('upi')}
+                                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                                        payMethod === 'upi'
+                                            ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg shadow-indigo-500/25'
+                                            : 'text-white/50 hover:text-white/80'
+                                    }`}
+                                >
+                                    <HiOutlineLightningBolt className="w-4 h-4" />
+                                    UPI
+                                </button>
+                            </div>
+
+                            {payMethod === 'card' ? (
+                                <div className="space-y-4">
+                                    {/* Card Number */}
+                                    <div>
+                                        <label className="block text-xs text-white/40 mb-1.5 uppercase tracking-wider">Card Number</label>
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                value={card.number}
+                                                onChange={(e) => setCard({ ...card, number: formatCardNumber(e.target.value) })}
+                                                placeholder="0000 0000 0000 0000"
+                                                maxLength={19}
+                                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/20 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 transition-all font-mono tracking-wider"
+                                            />
+                                            <HiOutlineCreditCard className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20" />
+                                        </div>
+                                    </div>
+
+                                    {/* Expiry + CVV */}
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="block text-xs text-white/40 mb-1.5 uppercase tracking-wider">Expiry</label>
+                                            <input
+                                                type="text"
+                                                value={card.expiry}
+                                                onChange={(e) => setCard({ ...card, expiry: formatExpiry(e.target.value) })}
+                                                placeholder="MM/YY"
+                                                maxLength={5}
+                                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/20 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 transition-all font-mono"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs text-white/40 mb-1.5 uppercase tracking-wider">CVV</label>
+                                            <input
+                                                type="password"
+                                                value={card.cvv}
+                                                onChange={(e) => setCard({ ...card, cvv: e.target.value.replace(/\D/g, '').slice(0, 3) })}
+                                                placeholder="•••"
+                                                maxLength={3}
+                                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/20 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 transition-all font-mono"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Cardholder Name */}
+                                    <div>
+                                        <label className="block text-xs text-white/40 mb-1.5 uppercase tracking-wider">Cardholder Name</label>
+                                        <input
+                                            type="text"
+                                            value={card.name}
+                                            onChange={(e) => setCard({ ...card, name: e.target.value })}
+                                            placeholder="Name on card"
+                                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/20 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 transition-all"
+                                        />
+                                    </div>
+
+                                    {/* Test Card Button */}
+                                    <button
+                                        type="button"
+                                        onClick={fillTestCard}
+                                        className="w-full py-2 text-xs text-indigo-400 hover:text-indigo-300 bg-indigo-500/10 hover:bg-indigo-500/15 border border-indigo-500/20 rounded-lg transition-all flex items-center justify-center gap-2"
+                                    >
+                                        <HiOutlineLightningBolt className="w-3.5 h-3.5" />
+                                        Use Test Card (Auto-fill)
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    {/* Fake QR Code */}
+                                    <div className="flex flex-col items-center py-4">
+                                        <div className="w-40 h-40 bg-white rounded-2xl p-3 mb-4 shadow-lg">
+                                            <div className="w-full h-full grid grid-cols-8 grid-rows-8 gap-[2px]">
+                                                {Array.from({ length: 64 }).map((_, i) => (
+                                                    <div
+                                                        key={i}
+                                                        className={`rounded-[1px] ${
+                                                            // Create a QR-code-like pattern
+                                                            (i < 24 && (i % 8 < 3 || (i >= 5 && i % 8 >= 5))) ||
+                                                            (i >= 40 && i < 48 && i % 8 < 3) ||
+                                                            Math.random() > 0.5
+                                                                ? 'bg-gray-900'
+                                                                : 'bg-white'
+                                                        }`}
+                                                    />
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <p className="text-white/40 text-xs">Scan QR code or enter UPI ID below</p>
+                                    </div>
+
+                                    {/* UPI ID Input */}
+                                    <div>
+                                        <label className="block text-xs text-white/40 mb-1.5 uppercase tracking-wider">UPI ID</label>
+                                        <input
+                                            type="text"
+                                            value={upiId}
+                                            onChange={(e) => setUpiId(e.target.value)}
+                                            placeholder="yourname@upi"
+                                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/20 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 transition-all"
+                                        />
+                                    </div>
+
+                                    {/* Test UPI Button */}
+                                    <button
+                                        type="button"
+                                        onClick={fillTestUpi}
+                                        className="w-full py-2 text-xs text-indigo-400 hover:text-indigo-300 bg-indigo-500/10 hover:bg-indigo-500/15 border border-indigo-500/20 rounded-lg transition-all flex items-center justify-center gap-2"
+                                    >
+                                        <HiOutlineLightningBolt className="w-3.5 h-3.5" />
+                                        Use Test UPI (Auto-fill)
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* Pay Button */}
+                            <button
+                                onClick={handlePay}
+                                disabled={!canSubmit || processing}
+                                className="w-full py-3.5 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white rounded-xl font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 flex items-center justify-center gap-2"
+                            >
+                                {processing ? (
+                                    <>
+                                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                        Processing...
+                                    </>
+                                ) : (
+                                    <>
+                                        <HiOutlineShieldCheck className="w-5 h-5" />
+                                        Pay ₹{amount}
+                                    </>
+                                )}
+                            </button>
+
+                            {/* Security Badge */}
+                            <div className="flex items-center justify-center gap-2 text-white/30 text-[10px]">
+                                <HiOutlineShieldCheck className="w-3.5 h-3.5" />
+                                <span>Secured by Frolic Pay • Mock Gateway for Demo</span>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </motion.div>
+        </div>
+    )
+}
+
+// ─── Main Student Events Component ──────────────────────────────
 export default function StudentEvents() {
     const { user } = useAuth()
     const [events, setEvents] = useState([])
@@ -23,6 +316,7 @@ export default function StudentEvents() {
     const [registerLoading, setRegisterLoading] = useState(false)
     const [registerError, setRegisterError] = useState('')
     const [registerSuccess, setRegisterSuccess] = useState('')
+    const [showPayment, setShowPayment] = useState(false)
 
     const [groupName, setGroupName] = useState('')
     const [participants, setParticipants] = useState([
@@ -63,8 +357,7 @@ export default function StudentEvents() {
         setParticipants(updated)
     }
 
-    const handleRegister = async (e) => {
-        e.preventDefault()
+    const submitRegistration = async (paymentDone = false) => {
         setRegisterError('')
         setRegisterSuccess('')
         setRegisterLoading(true)
@@ -80,18 +373,20 @@ export default function StudentEvents() {
                 body: JSON.stringify({
                     GroupName: groupName,
                     EventID: selectedEvent._id,
-                    Participants: participants
+                    Participants: participants,
+                    IsPaymentDone: paymentDone
                 })
             })
             const data = await res.json()
             if (data.success) {
-                setRegisterSuccess('Group registered successfully!')
+                setRegisterSuccess(paymentDone ? 'Payment received & group registered successfully! 🎉' : 'Group registered successfully!')
                 setGroupName('')
                 setParticipants([{ Name: '', EnrollmentNum: '', InstituteName: '', City: '', Phone: '', Email: '', IsGroupLeader: true }])
                 setTimeout(() => {
                     setShowRegister(false)
+                    setShowPayment(false)
                     setRegisterSuccess('')
-                }, 2000)
+                }, 2500)
             } else {
                 setRegisterError(data.message || 'Registration failed')
             }
@@ -102,9 +397,27 @@ export default function StudentEvents() {
         }
     }
 
+    const handleRegister = async (e) => {
+        e.preventDefault()
+        // If the event has fees, show mock payment gateway first
+        if (selectedEvent.Fees > 0) {
+            setShowPayment(true)
+        } else {
+            // Free event — register directly
+            submitRegistration(false)
+        }
+    }
+
+    const handlePaymentSuccess = () => {
+        // Payment "succeeded" — now submit registration with payment done
+        setShowPayment(false)
+        submitRegistration(true)
+    }
+
     const openRegister = (event) => {
         setSelectedEvent(event)
         setShowRegister(true)
+        setShowPayment(false)
         setRegisterError('')
         setRegisterSuccess('')
         setGroupName('')
@@ -218,6 +531,7 @@ export default function StudentEvents() {
                                     <h3 className="text-xl font-bold text-white">Register for {selectedEvent.EventName}</h3>
                                     <p className="text-sm text-white/50">
                                         Team size: {selectedEvent.GroupMinParticipants}-{selectedEvent.GroupMaxParticipants} members
+                                        {selectedEvent.Fees > 0 && <span className="text-indigo-400 ml-2">• Fee: ₹{selectedEvent.Fees}</span>}
                                     </p>
                                 </div>
                                 <button onClick={() => setShowRegister(false)} className="text-white/60 hover:text-white">
@@ -297,6 +611,17 @@ export default function StudentEvents() {
                                     </div>
                                 </div>
 
+                                {/* Fee Notice */}
+                                {selectedEvent.Fees > 0 && (
+                                    <div className="p-4 bg-indigo-500/10 border border-indigo-500/20 rounded-xl flex items-center gap-3">
+                                        <HiOutlineCurrencyRupee className="w-6 h-6 text-indigo-400 flex-shrink-0" />
+                                        <div>
+                                            <p className="text-sm text-white font-medium">Registration Fee: ₹{selectedEvent.Fees}</p>
+                                            <p className="text-xs text-white/50">You will be redirected to Frolic Pay to complete your payment</p>
+                                        </div>
+                                    </div>
+                                )}
+
                                 <div className="flex justify-end gap-3 pt-2">
                                     <button type="button" onClick={() => setShowRegister(false)} className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20">
                                         Cancel
@@ -304,14 +629,30 @@ export default function StudentEvents() {
                                     <button
                                         type="submit"
                                         disabled={registerLoading || participants.length < selectedEvent.GroupMinParticipants}
-                                        className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className={`px-6 py-2 text-white rounded-xl font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                                            selectedEvent.Fees > 0
+                                                ? 'bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600'
+                                                : 'bg-blue-500 hover:bg-blue-600'
+                                        }`}
                                     >
-                                        {registerLoading ? 'Registering...' : 'Register Group'}
+                                        {registerLoading ? 'Registering...' : selectedEvent.Fees > 0 ? `Proceed to Pay ₹${selectedEvent.Fees}` : 'Register Group'}
                                     </button>
                                 </div>
                             </form>
                         </motion.div>
                     </div>
+                )}
+            </AnimatePresence>
+
+            {/* Mock Payment Gateway */}
+            <AnimatePresence>
+                {showPayment && selectedEvent && (
+                    <MockPaymentGateway
+                        amount={selectedEvent.Fees}
+                        eventName={selectedEvent.EventName}
+                        onSuccess={handlePaymentSuccess}
+                        onCancel={() => setShowPayment(false)}
+                    />
                 )}
             </AnimatePresence>
         </div>
