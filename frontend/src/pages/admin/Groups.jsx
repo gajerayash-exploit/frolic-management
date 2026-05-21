@@ -179,8 +179,8 @@ export default function AdminGroups() {
                             <div className="grid grid-cols-2 gap-4 mb-6">
                                 <div className="p-4 bg-white/5 rounded-xl">
                                     <p className="text-xs text-white/40 mb-1">Registered By</p>
-                                    <p className="text-sm text-white">{selectedGroup.CreatedBy?.UserName || 'Unknown'}</p>
-                                    <p className="text-xs text-white/60">{selectedGroup.CreatedBy?.EmailAddress}</p>
+                                    <p className="text-sm text-white truncate" title={selectedGroup.CreatedBy?.UserName || 'Unknown'}>{selectedGroup.CreatedBy?.UserName || 'Unknown'}</p>
+                                    <p className="text-xs text-white/60 break-all">{selectedGroup.CreatedBy?.EmailAddress}</p>
                                 </div>
                                 <div className="p-4 bg-white/5 rounded-xl">
                                     <p className="text-xs text-white/40 mb-1">Status</p>
@@ -200,16 +200,16 @@ export default function AdminGroups() {
                             <div className="space-y-3">
                                 {selectedGroup.participants && selectedGroup.participants.length > 0 ? (
                                     selectedGroup.participants.map((p, i) => (
-                                        <div key={i} className="p-4 bg-white/5 rounded-xl flex justify-between items-center">
-                                            <div>
-                                                <h4 className="font-medium text-white flex items-center gap-2">
-                                                    {p.Name} 
-                                                    {p.IsGroupLeader && <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400">Leader</span>}
+                                        <div key={i} className="p-4 bg-white/5 rounded-xl flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+                                            <div className="flex-1 min-w-0">
+                                                <h4 className="font-medium text-white flex items-center gap-2 flex-wrap">
+                                                    <span className="truncate">{p.Name}</span>
+                                                    {p.IsGroupLeader && <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 whitespace-nowrap">Leader</span>}
                                                 </h4>
-                                                <p className="text-sm text-white/50">{p.EnrollmentNum} • {p.InstituteName}</p>
+                                                <p className="text-sm text-white/50 truncate">{p.EnrollmentNum} • {p.InstituteName}</p>
                                             </div>
-                                            <div className="text-right text-sm text-white/50">
-                                                <p>{p.Email}</p>
+                                            <div className="sm:text-right text-sm text-white/50 flex-shrink-0 max-w-full">
+                                                <p className="break-all sm:break-normal truncate sm:max-w-[200px]" title={p.Email}>{p.Email}</p>
                                                 <p>{p.Phone}</p>
                                             </div>
                                         </div>
