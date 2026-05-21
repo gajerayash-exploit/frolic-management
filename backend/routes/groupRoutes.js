@@ -3,7 +3,8 @@ import {
     registerGroup,
     getGroups,
     getGroupById,
-    updateGroup
+    updateGroup,
+    editGroupByOwner
 } from '../controllers/groupController.js';
 import { protect, authorize, adminOnly } from '../middleware/auth.js';
 
@@ -16,5 +17,6 @@ router.post('/', protect, registerGroup);
 router.get('/', getGroups);
 router.get('/:id', getGroupById);
 router.put('/:id', protect, updateGroup);
+router.put('/:id/edit', protect, editGroupByOwner);
 
 export default router;

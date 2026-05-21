@@ -166,3 +166,88 @@ export const updateGroup = async (req, res) => {
         res.status(500).json({ success: false, message: 'Server error' });
     }
 };
+
+// @desc    Edit group details by owner (group name + participants)
+// @route   PUT /api/groups/:id/edit
+// @access  Private (Owner only)
+export const editGroupByOwner = async (req, res) => {
+    try {
+        const group = await Group.findById(req.params.id)
+            .populate('participants');
+
+        if (!group) {
+            return res.status(404).json({ success: false, message: 'Group not found' });
+        }
+
+        // Only the creator can edit
+        if (String(group.CreatedBy) !== String(req.user._id)) {
+            return res.status(403).json({ success: false, message: 'Only the group creator can edit this group' });
+        }
+
+        // Cannot edit if attendance is already marked (event is done)
+        if (group.IsPresent) {
+            return res.status(400).json({ success: false, message: 'Cannot edit group after attendance has been marked' });
+        }
+
+        const { GroupName, Participants } = req.body;
+
+        // Validate event constraints
+        const event = await Event.findById(group.EventID);
+        if (!event) {
+            return res.status(404).json({ success: false, message: 'Associated event not found' });
+        }
+
+        if (Participants && (Participants.length < event.GroupMinParticipants || Participants.length > event.GroupMaxParticipants)) {
+            return res.status(400).json({
+                success: false,
+                message: `Group size must be between ${event.GroupMinParticipants} and ${event.GroupMaxParticipants}`
+            });
+        }
+
+        // Check for duplicate group name if changed
+        if (GroupName && GroupName !== group.GroupName) {
+            const existing = await Group.findOne({ GroupName, EventID: group.EventID, _id: { $ne: group._id } });
+            if (existing) {
+                return res.status(400).json({ success: false, message: 'Group name already exists for this event' });
+            }
+            group.GroupName = GroupName;
+            await group.save();
+        }
+
+        // Update participants if provided
+        if (Participants && Participants.length > 0) {
+            // Delete all old participants
+            await Participant.deleteMany({ GroupID: group._id });
+
+            // Create new participants
+            const participantPromises = Participants.map(p => {
+                return Participant.create({
+                    Name: p.Name,
+                    EnrollmentNum: p.EnrollmentNum,
+                    InstituteName: p.InstituteName,
+                    City: p.City,
+                    Phone: p.Phone,
+                    Email: p.Email,
+                    IsGroupLeader: p.IsGroupLeader || false,
+                    GroupID: group._id
+                });
+            });
+            await Promise.all(participantPromises);
+        }
+
+        // Fetch updated group with participants
+        const updatedGroup = await Group.findById(group._id)
+            .populate('EventID', 'EventName')
+            .populate('participants')
+            .populate('CreatedBy', 'UserName EmailAddress');
+
+        res.status(200).json({
+            success: true,
+            message: 'Group updated successfully',
+            data: updatedGroup
+        });
+    } catch (error) {
+        console.error('Edit group by owner error:', error);
+        res.status(500).json({ success: false, message: error.message || 'Server error' });
+    }
+};
