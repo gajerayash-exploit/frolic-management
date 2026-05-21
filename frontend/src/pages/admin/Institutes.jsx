@@ -69,7 +69,13 @@ export default function Institutes() {
                 headers: getAuthHeaders()
             })
             const data = await response.json()
-            setCoordinators(data || [])
+            if (Array.isArray(data)) {
+                setCoordinators(data)
+            } else if (data && Array.isArray(data.data)) {
+                setCoordinators(data.data)
+            } else {
+                setCoordinators([])
+            }
         } catch (err) {
             console.error('Fetch coordinators error:', err)
         }
@@ -126,10 +132,15 @@ export default function Institutes() {
 
             const method = modalMode === 'add' ? 'POST' : 'PUT'
 
+            const submitData = { ...formData }
+            if (submitData.InstituteCoordinatorID === '') {
+                submitData.InstituteCoordinatorID = null
+            }
+
             const response = await fetch(url, {
                 method,
                 headers: getAuthHeaders(),
-                body: JSON.stringify(formData)
+                body: JSON.stringify(submitData)
             })
 
             const data = await response.json()
