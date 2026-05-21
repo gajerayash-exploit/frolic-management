@@ -156,7 +156,7 @@ export default function AdminGroups() {
                 </div>
             )}
 
-            {/* Participants Modal */}
+            {/* Details & Participants Modal */}
             <AnimatePresence>
                 {selectedGroup && (
                     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -169,18 +169,43 @@ export default function AdminGroups() {
                             <div className="flex justify-between items-center mb-6">
                                 <div>
                                     <h3 className="text-xl font-bold text-white">{selectedGroup.GroupName}</h3>
-                                    <p className="text-accent-400 text-sm">{selectedGroup.EventID?.EventName} — Participants</p>
+                                    <p className="text-accent-400 text-sm">{selectedGroup.EventID?.EventName}</p>
                                 </div>
                                 <button onClick={() => setSelectedGroup(null)} className="text-white/60 hover:text-white">
                                     <HiOutlineXCircle className="w-6 h-6" />
                                 </button>
                             </div>
+
+                            <div className="grid grid-cols-2 gap-4 mb-6">
+                                <div className="p-4 bg-white/5 rounded-xl">
+                                    <p className="text-xs text-white/40 mb-1">Registered By</p>
+                                    <p className="text-sm text-white">{selectedGroup.CreatedBy?.UserName || 'Unknown'}</p>
+                                    <p className="text-xs text-white/60">{selectedGroup.CreatedBy?.EmailAddress}</p>
+                                </div>
+                                <div className="p-4 bg-white/5 rounded-xl">
+                                    <p className="text-xs text-white/40 mb-1">Status</p>
+                                    <p className="text-sm text-white flex items-center gap-2">
+                                        Payment: <span className={selectedGroup.IsPaymentDone ? 'text-green-400' : 'text-red-400'}>{selectedGroup.IsPaymentDone ? 'Done' : 'Pending'}</span>
+                                    </p>
+                                    <p className="text-sm text-white flex items-center gap-2">
+                                        Attendance: <span className={selectedGroup.IsPresent ? 'text-blue-400' : 'text-gray-400'}>{selectedGroup.IsPresent ? 'Present' : 'Absent'}</span>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <h4 className="text-lg font-semibold text-white mb-3 flex items-center justify-between">
+                                <span>Participants</span>
+                                <span className="text-sm font-normal text-white/50">{selectedGroup.participants?.length || 0} members</span>
+                            </h4>
                             <div className="space-y-3">
                                 {selectedGroup.participants && selectedGroup.participants.length > 0 ? (
                                     selectedGroup.participants.map((p, i) => (
                                         <div key={i} className="p-4 bg-white/5 rounded-xl flex justify-between items-center">
                                             <div>
-                                                <h4 className="font-medium text-white">{p.Name}</h4>
+                                                <h4 className="font-medium text-white flex items-center gap-2">
+                                                    {p.Name} 
+                                                    {p.IsGroupLeader && <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400">Leader</span>}
+                                                </h4>
                                                 <p className="text-sm text-white/50">{p.EnrollmentNum} • {p.InstituteName}</p>
                                             </div>
                                             <div className="text-right text-sm text-white/50">
