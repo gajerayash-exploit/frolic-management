@@ -227,7 +227,7 @@ function DashboardHome() {
                 </div>
 
                 {/* Upcoming Events List */}
-                <div className="glass-card p-6 h-full min-h-[300px] flex flex-col">
+                <div className="glass-card p-6 h-[404px] flex flex-col">
                     <div className="flex items-center justify-between mb-4 shrink-0">
                         <h3 className="text-lg font-semibold text-white">Upcoming Events</h3>
                         <Link to="/student/events" className="text-sm text-blue-400 hover:text-blue-300">
