@@ -156,7 +156,7 @@ function TopBar({ setIsOpen, onLogout }) {
 // Student Dashboard Home — Premium SaaS Analytics
 function DashboardHome() {
     const { user } = useAuth()
-    const { stats, charts, loading } = useDashboardData('student', user?._id)
+    const { stats, charts, loading } = useDashboardData('student', user?.id || user?._id)
     const [upcomingEvents, setUpcomingEvents] = useState([])
 
     // Fetch upcoming events separately for the list section
@@ -190,7 +190,7 @@ function DashboardHome() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <MiniStatCard
                     label="Registered Events"
-                    value={loading ? '...' : stats.registeredEvents}
+                    value={loading ? '...' : (stats.registeredEvents || 0)}
                     gradient="from-blue-500 to-cyan-500"
                     icon={<HiOutlineCalendar className="w-5 h-5 text-white" />}
                     delay={0}
@@ -199,7 +199,7 @@ function DashboardHome() {
                 />
                 <MiniStatCard
                     label="My Groups"
-                    value={loading ? '...' : stats.myGroups}
+                    value={loading ? '...' : (stats.myGroups || 0)}
                     gradient="from-emerald-500 to-teal-500"
                     icon={<HiOutlineUserGroup className="w-5 h-5 text-white" />}
                     delay={0.1}
@@ -207,7 +207,7 @@ function DashboardHome() {
                 />
                 <MiniStatCard
                     label="Achievements"
-                    value={loading ? '...' : stats.achievements}
+                    value={loading ? '...' : (stats.achievements || 0)}
                     gradient="from-amber-500 to-orange-500"
                     icon={<HiOutlineStar className="w-5 h-5 text-white" />}
                     delay={0.2}

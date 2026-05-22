@@ -73,7 +73,7 @@ export default function MiniStatCard({
                                 <p className="text-3xl font-bold text-white tracking-tight mb-1">
                                     {value}
                                 </p>
-                                <p className="text-sm text-white/50 truncate text-center">{label}</p>
+                                <p className="text-sm text-white/50 truncate">{label}</p>
                             </>
                         )}
                     </div>
