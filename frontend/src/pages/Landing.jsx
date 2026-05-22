@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
+import duLogo from '../assets/du-logo.png'
 
 // Technical Events
 const technicalEvents = [
@@ -98,7 +99,7 @@ export default function Landing() {
                     transition={{ duration: 0.8, ease: 'easeOut' }}
                     className="text-center mb-8"
                 >
-                    <img src="/logo.png" alt="FROLIC Logo" className="w-28 h-28 mx-auto mb-6 object-contain filter drop-shadow-[0_0_20px_rgba(168,85,247,0.6)] hover:scale-110 transition-transform duration-300" />
+                    <img src={duLogo} alt="Darshan University Logo" className="w-28 h-28 mx-auto mb-6 object-contain filter drop-shadow-[0_0_20px_rgba(168,85,247,0.6)] hover:scale-110 transition-transform duration-300" />
                     <h1 className="text-6xl md:text-8xl font-bold mb-4">
                         <span className="bg-clip-text text-transparent bg-gradient-to-r from-accent-400 via-primary-400 to-accent-500">FROLIC</span>
                     </h1>
