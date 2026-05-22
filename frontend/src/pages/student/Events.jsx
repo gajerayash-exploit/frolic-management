@@ -229,22 +229,8 @@ function MockPaymentGateway({ amount, eventName, onSuccess, onCancel }) {
                                 <div className="space-y-4">
                                     {/* Fake QR Code */}
                                     <div className="flex flex-col items-center py-4">
-                                        <div className="w-40 h-40 bg-white rounded-2xl p-3 mb-4 shadow-lg">
-                                            <div className="w-full h-full grid grid-cols-8 grid-rows-8 gap-[2px]">
-                                                {Array.from({ length: 64 }).map((_, i) => (
-                                                    <div
-                                                        key={i}
-                                                        className={`rounded-[1px] ${
-                                                            // Create a QR-code-like pattern
-                                                            (i < 24 && (i % 8 < 3 || (i >= 5 && i % 8 >= 5))) ||
-                                                            (i >= 40 && i < 48 && i % 8 < 3) ||
-                                                            Math.random() > 0.5
-                                                                ? 'bg-gray-900'
-                                                                : 'bg-white'
-                                                        }`}
-                                                    />
-                                                ))}
-                                            </div>
+                                        <div className="w-40 h-40 bg-white rounded-2xl p-2 mb-4 shadow-lg overflow-hidden flex items-center justify-center">
+                                            <img src="/qr.png" alt="Payment QR Code" className="w-full h-full object-cover" />
                                         </div>
                                         <p className="text-white/40 text-xs">Scan QR code or enter UPI ID below</p>
                                     </div>
