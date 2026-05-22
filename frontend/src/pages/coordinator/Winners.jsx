@@ -114,7 +114,7 @@ export default function CoordinatorWinners() {
 
             {loading ? (
                 <div className="text-center py-12">
-                    <div className="animate-spin w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full mx-auto mb-4" />
+                    <div className="animate-spin w-8 h-8 border-2 border-accent-500 border-t-transparent rounded-full mx-auto mb-4" />
                     <p className="text-white/60">Loading...</p>
                 </div>
             ) : winners.length === 0 ? (
@@ -139,7 +139,7 @@ export default function CoordinatorWinners() {
                                 </div>
                                 <div>
                                     <h3 className="text-lg font-bold text-white">{winner.GroupID?.GroupName || 'Unknown Group'}</h3>
-                                    <p className="text-sm text-emerald-400">{winner.EventID?.EventName || 'Unknown Event'}</p>
+                                    <p className="text-sm text-accent-400">{winner.EventID?.EventName || 'Unknown Event'}</p>
                                     {winner.Prize && <p className="text-xs text-white/50 mt-1">Prize: {winner.Prize}</p>}
                                 </div>
                             </div>
@@ -174,21 +174,21 @@ export default function CoordinatorWinners() {
                             <form onSubmit={handleDeclare} className="space-y-4">
                                 <div>
                                     <label className="block text-sm text-white/60 mb-1">Event</label>
-                                    <select value={form.EventID} onChange={(e) => handleEventChange(e.target.value)} required className="w-full px-4 py-2 bg-midnight-900 border border-white/20 rounded-xl text-white focus:outline-none focus:border-emerald-500 [&>option]:bg-midnight-900 [&>option]:text-white">
+                                    <select value={form.EventID} onChange={(e) => handleEventChange(e.target.value)} required className="w-full px-4 py-2 bg-midnight-900 border border-white/20 rounded-xl text-white focus:outline-none focus:border-accent-500 [&>option]:bg-midnight-900 [&>option]:text-white">
                                         <option value="">Select Event</option>
                                         {myEvents.map(ev => <option key={ev._id} value={ev._id}>{ev.EventName}</option>)}
                                     </select>
                                 </div>
                                 <div>
                                     <label className="block text-sm text-white/60 mb-1">Group</label>
-                                    <select value={form.GroupID} onChange={(e) => setForm({ ...form, GroupID: e.target.value })} required className="w-full px-4 py-2 bg-midnight-900 border border-white/20 rounded-xl text-white focus:outline-none focus:border-emerald-500 [&>option]:bg-midnight-900 [&>option]:text-white">
+                                    <select value={form.GroupID} onChange={(e) => setForm({ ...form, GroupID: e.target.value })} required className="w-full px-4 py-2 bg-midnight-900 border border-white/20 rounded-xl text-white focus:outline-none focus:border-accent-500 [&>option]:bg-midnight-900 [&>option]:text-white">
                                         <option value="">Select Group</option>
                                         {eventGroups.map(g => <option key={g._id} value={g._id}>{g.GroupName}</option>)}
                                     </select>
                                 </div>
                                 <div>
                                     <label className="block text-sm text-white/60 mb-1">Position</label>
-                                    <select value={form.Sequence} onChange={(e) => setForm({ ...form, Sequence: e.target.value })} required className="w-full px-4 py-2 bg-midnight-900 border border-white/20 rounded-xl text-white focus:outline-none focus:border-emerald-500 [&>option]:bg-midnight-900 [&>option]:text-white">
+                                    <select value={form.Sequence} onChange={(e) => setForm({ ...form, Sequence: e.target.value })} required className="w-full px-4 py-2 bg-midnight-900 border border-white/20 rounded-xl text-white focus:outline-none focus:border-accent-500 [&>option]:bg-midnight-900 [&>option]:text-white">
                                         <option value="1">1st Place</option>
                                         <option value="2">2nd Place</option>
                                         <option value="3">3rd Place</option>
@@ -196,9 +196,9 @@ export default function CoordinatorWinners() {
                                 </div>
                                 <div>
                                     <label className="block text-sm text-white/60 mb-1">Prize (optional)</label>
-                                    <input type="text" value={form.Prize} onChange={(e) => setForm({ ...form, Prize: e.target.value })} placeholder="e.g. Trophy + ₹5000" className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500" />
+                                    <input type="text" value={form.Prize} onChange={(e) => setForm({ ...form, Prize: e.target.value })} placeholder="e.g. Trophy + ₹5000" className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-accent-500" />
                                 </div>
-                                <button type="submit" className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-medium transition-colors">Declare Winner</button>
+                                <button type="submit" className="w-full py-3 bg-accent-500 hover:bg-accent-600 text-white rounded-xl font-medium transition-colors">Declare Winner</button>
                             </form>
                         </motion.div>
                     </div>

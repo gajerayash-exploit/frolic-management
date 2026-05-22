@@ -100,7 +100,7 @@ export default function InstituteView() {
                                 <span className="text-white">{departments.length} Departments</span>
                             </div>
                             <div className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 flex items-center gap-2">
-                                <HiOutlineCalendar className="w-5 h-5 text-emerald-400" />
+                                <HiOutlineCalendar className="w-5 h-5 text-accent-400" />
                                 <span className="text-white">{events.length} Events</span>
                             </div>
                         </div>
