@@ -418,18 +418,7 @@ function DashboardHome() {
     )
 }
 
-// Placeholder components for other routes
-function PlaceholderPage({ title }) {
-    return (
-        <div className="space-y-6">
-            <h1 className="text-2xl font-bold text-white">{title}</h1>
-            <div className="glass-card p-12 text-center">
-                <p className="text-white/60">This section is under development</p>
-                <p className="text-sm text-white/40 mt-2">Coming soon...</p>
-            </div>
-        </div>
-    )
-}
+
 
 export default function AdminDashboard() {
     const [sidebarOpen, setSidebarOpen] = useState(false)
