@@ -297,6 +297,7 @@ export default function Landing() {
                                     value={formData.email}
                                     onChange={handleInputChange}
                                     placeholder="Enter your email"
+                                    autoComplete="username"
                                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-accent-500/50"
                                     required
                                 />
@@ -327,6 +328,7 @@ export default function Landing() {
                                     value={formData.password}
                                     onChange={handleInputChange}
                                     placeholder="Enter your password"
+                                    autoComplete="current-password"
                                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-accent-500/50"
                                     required
                                     minLength={6}

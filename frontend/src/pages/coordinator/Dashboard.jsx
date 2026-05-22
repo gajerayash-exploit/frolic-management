@@ -21,6 +21,7 @@ import DepartmentView from './DepartmentView'
 import EventView from './EventView'
 import CoordinatorGroups from './Groups'
 import CoordinatorWinners from './Winners'
+import CoordinatorAttendance from './Attendance'
 
 // Chart components
 import MiniStatCard from '../../components/charts/MiniStatCard'
@@ -32,7 +33,8 @@ import useDashboardData from '../../hooks/useDashboardData'
 const sidebarItems = [
     { path: '/coordinator', icon: HiOutlineHome, label: 'Dashboard', exact: true },
     { path: '/coordinator/events', icon: HiOutlineCalendar, label: 'My Events' },
-    { path: '/coordinator/groups', icon: HiOutlineClipboardCheck, label: 'Groups' },
+    { path: '/coordinator/groups', icon: HiOutlineUserGroup, label: 'Groups' },
+    { path: '/coordinator/attendance', icon: HiOutlineClipboardCheck, label: 'Attendance' },
     { path: '/coordinator/winners', icon: HiOutlineStar, label: 'Winners' },
 ]
 
@@ -293,7 +295,7 @@ export default function CoordinatorDashboard() {
                         <Route index element={<DashboardHome />} />
                         <Route path="events/*" element={<CoordinatorEvents />} />
                         <Route path="groups/*" element={<CoordinatorGroups />} />
-                        <Route path="attendance/*" element={<CoordinatorGroups />} />
+                        <Route path="attendance/*" element={<CoordinatorAttendance />} />
                         <Route path="payments/*" element={<CoordinatorGroups />} />
                         <Route path="winners/*" element={<CoordinatorWinners />} />
                     </Routes>

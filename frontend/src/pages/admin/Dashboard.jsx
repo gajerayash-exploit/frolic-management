@@ -26,6 +26,7 @@ import Users from './Users'
 import Groups from './Groups'
 import Winners from './Winners'
 import Settings from './settings'
+import AdminAttendance from './Attendance'
 
 // Chart components
 import MiniStatCard from '../../components/charts/MiniStatCard'
@@ -44,6 +45,7 @@ const sidebarItems = [
     { path: '/admin/departments', icon: HiOutlineCollection, label: 'Departments' },
     { path: '/admin/events', icon: HiOutlineCalendar, label: 'Events' },
     { path: '/admin/groups', icon: HiOutlineUserGroup, label: 'Groups' },
+    { path: '/admin/attendance', icon: HiOutlineClipboardCheck, label: 'Attendance' },
     { path: '/admin/users', icon: HiOutlineUsers, label: 'Users' },
     { path: '/admin/winners', icon: HiOutlineStar, label: 'Winners' },
     { path: '/admin/settings', icon: HiOutlineCog, label: 'Settings' },
@@ -444,6 +446,7 @@ export default function AdminDashboard() {
                         <Route path="departments/*" element={<Departments />} />
                         <Route path="events/*" element={<Events />} />
                         <Route path="groups/*" element={<Groups />} />
+                        <Route path="attendance/*" element={<AdminAttendance />} />
                         <Route path="users/*" element={<Users />} />
                         <Route path="winners/*" element={<Winners />} />
                         <Route path="settings/*" element={<Settings />} />
