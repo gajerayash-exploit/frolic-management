@@ -39,7 +39,7 @@ export default function DepartmentView() {
             }
         }
 
-        if (user?._id) {
+        if (user?.id || user?._id) {
             fetchData()
         }
     }, [user])

@@ -52,7 +52,7 @@ export default function InstituteView() {
             }
         }
 
-        if (user?._id) {
+        if (user?.id || user?._id) {
             fetchData()
         }
     }, [user])
