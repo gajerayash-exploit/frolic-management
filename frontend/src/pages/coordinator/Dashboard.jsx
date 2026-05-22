@@ -84,7 +84,7 @@ function Sidebar({ isOpen, setIsOpen }) {
                                             to={item.path}
                                             onClick={() => setIsOpen(false)}
                                             className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${isActive
-                                                ? 'bg-emerald-500/20 text-emerald-400'
+                                                ? 'bg-accent-500/20 text-accent-400 shadow-glow-sm'
                                                 : 'text-white/60 hover:text-white hover:bg-white/5'
                                                 }`}
                                         >
@@ -100,7 +100,7 @@ function Sidebar({ isOpen, setIsOpen }) {
                     <div className="p-4 border-t border-white/10">
                         <div className="glass-card p-4 mb-4">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
+                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-rose-500 to-orange-500 flex items-center justify-center">
                                     <span className="text-white font-semibold text-sm">
                                         {user?.UserName?.charAt(0) || 'C'}
                                     </span>
@@ -171,16 +171,7 @@ function DashboardHome() {
     const { user } = useAuth()
     const { stats, charts, loading } = useDashboardData('coordinator')
 
-    // Choose specific view based on role
-    if (user?.role === 'institute_coordinator') {
-        return <InstituteView />
-    }
-    if (user?.role === 'department_coordinator') {
-        return <DepartmentView />
-    }
-    if (user?.role === 'event_coordinator') {
-        return <EventView />
-    }
+    // The role-specific views will be rendered at the bottom of the dashboard
 
     // Sparkline data for stat cards
     const grpSparkline = (charts.groupParticipation || []).map(d => d.teams)
@@ -255,8 +246,12 @@ function DashboardHome() {
                     delay={0.5}
                 />
             </div>
-
-            <p className="text-white/40 text-center mt-10">Select a specific role to see a customized dashboard.</p>
+            <div className="mt-8 pt-8 border-t border-white/10">
+                {user?.role === 'institute_coordinator' && <InstituteView />}
+                {user?.role === 'department_coordinator' && <DepartmentView />}
+                {user?.role === 'event_coordinator' && <EventView />}
+                {user?.role === 'coordinator' && <EventView />}
+            </div>
         </div>
     )
 }
@@ -272,7 +267,6 @@ function PlaceholderPage({ title }) {
         </div>
     )
 }
-
 export default function CoordinatorDashboard() {
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const { logout } = useAuth()
