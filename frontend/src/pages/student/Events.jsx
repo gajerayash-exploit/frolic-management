@@ -56,9 +56,12 @@ function MockPaymentGateway({ amount, eventName, onSuccess, onCancel }) {
             setProcessing(false)
             setSuccess(true)
             
-            // Play the success sound effect
-            const audio = new Audio('/success.mp3')
-            audio.play().catch(err => console.log('Audio playback failed:', err))
+            // Play the success sound effect using the hidden audio element
+            const audioEl = document.getElementById('success-audio')
+            if (audioEl) {
+                audioEl.volume = 1.0
+                audioEl.play().catch(err => console.log('Audio playback failed:', err))
+            }
 
             // After showing success, call onSuccess
             setTimeout(() => {
@@ -69,6 +72,9 @@ function MockPaymentGateway({ amount, eventName, onSuccess, onCancel }) {
 
     return (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-md z-[60] flex items-center justify-center p-4">
+            {/* Hidden audio element for reliable playback */}
+            <audio id="success-audio" src="/success.mp3" preload="auto" />
+            
             <motion.div
                 initial={{ opacity: 0, scale: 0.9, y: 30 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
