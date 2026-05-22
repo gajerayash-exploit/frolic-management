@@ -20,7 +20,7 @@ export default function EventView() {
         const fetchData = async () => {
             try {
                 // Fetch my events
-                const eventRes = await fetch(`/api/events?EventCoordinatorID=${user._id}`)
+                const eventRes = await fetch(`/api/events?EventCoordinatorID=${user?.id || user?._id}`)
                 const eventData = await eventRes.json()
                 setEvents(eventData.data || [])
             } catch (error) {
@@ -30,7 +30,7 @@ export default function EventView() {
             }
         }
 
-        if (user?._id) {
+        if (user?.id || user?._id) {
             fetchData()
         }
     }, [user])
