@@ -55,6 +55,11 @@ function MockPaymentGateway({ amount, eventName, onSuccess, onCancel }) {
         setTimeout(() => {
             setProcessing(false)
             setSuccess(true)
+            
+            // Play the success sound effect
+            const audio = new Audio('/success.mp3')
+            audio.play().catch(err => console.log('Audio playback failed:', err))
+
             // After showing success, call onSuccess
             setTimeout(() => {
                 onSuccess()
