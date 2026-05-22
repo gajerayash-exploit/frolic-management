@@ -60,7 +60,7 @@ export default function EventView() {
                         transition={{ delay: index * 0.1 }}
                         className="glass-card p-0 overflow-hidden group"
                     >
-                        <div className="h-32 bg-gradient-to-r from-orange-500 to-pink-600 relative">
+                        <div className="h-32 bg-gradient-to-r from-accent-500 to-indigo-600 relative">
                             <div className="absolute inset-0 bg-black/20" />
                             <div className="absolute bottom-4 left-6">
                                 <h2 className="text-2xl font-bold text-white shadow-sm">{event.EventName}</h2>
@@ -71,19 +71,19 @@ export default function EventView() {
                         <div className="p-6">
                             <div className="grid grid-cols-2 gap-4 mb-6">
                                 <div className="flex items-center gap-3 text-white/70">
-                                    <HiOutlineLocationMarker className="w-5 h-5 text-orange-400" />
+                                    <HiOutlineLocationMarker className="w-5 h-5 text-accent-400" />
                                     <span>{event.Location || 'TBD'}</span>
                                 </div>
                                 <div className="flex items-center gap-3 text-white/70">
-                                    <HiOutlineClock className="w-5 h-5 text-orange-400" />
+                                    <HiOutlineClock className="w-5 h-5 text-accent-400" />
                                     <span>{event.EventTime || 'TBD'}</span>
                                 </div>
                                 <div className="flex items-center gap-3 text-white/70">
-                                    <HiOutlineUsers className="w-5 h-5 text-orange-400" />
+                                    <HiOutlineUsers className="w-5 h-5 text-accent-400" />
                                     <span>{event.GroupMaxParticipants} Max / Group</span>
                                 </div>
                                 <div className="flex items-center gap-3 text-white/70">
-                                    <HiOutlineCurrencyRupee className="w-5 h-5 text-orange-400" />
+                                    <HiOutlineCurrencyRupee className="w-5 h-5 text-accent-400" />
                                     <span>Fees: ₹{event.Fees}</span>
                                 </div>
                             </div>
@@ -97,7 +97,7 @@ export default function EventView() {
                                 </Link>
                                 <Link
                                     to="/coordinator/attendance"
-                                    className="flex-1 py-2 text-center rounded-lg bg-orange-500/20 text-orange-400 hover:bg-orange-500/30 transition-colors text-sm font-medium flex items-center justify-center gap-2"
+                                    className="flex-1 py-2 text-center rounded-lg bg-accent-500/20 text-accent-400 hover:bg-accent-500/30 transition-colors text-sm font-medium flex items-center justify-center gap-2"
                                 >
                                     <HiOutlineClipboardCheck className="w-4 h-4" />
                                     Attendance
