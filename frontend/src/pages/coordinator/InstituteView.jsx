@@ -21,7 +21,7 @@ export default function InstituteView() {
         const fetchData = async () => {
             try {
                 // Fetch my institute
-                const instRes = await fetch(`/api/institutes?InstituteCoordinatorID=${user._id}`)
+                const instRes = await fetch(`/api/institutes?InstituteCoordinatorID=${user?.id || user?._id}`)
                 const instData = await instRes.json()
 
                 if (instData.data && instData.data.length > 0) {

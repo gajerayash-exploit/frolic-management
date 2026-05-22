@@ -52,13 +52,13 @@ export default function CoordinatorEvents() {
 
             // Logic to fetch events based on role
             if (user.role === 'institute_coordinator') {
-                const instRes = await fetch(`/api/institutes?InstituteCoordinatorID=${user._id}`)
+                const instRes = await fetch(`/api/institutes?InstituteCoordinatorID=${user?.id || user?._id}`)
                 const instData = await instRes.json()
                 if (instData.data && instData.data.length > 0) {
                     // We fetch all for simplicity
                 }
             } else if (user.role === 'department_coordinator') {
-                const deptRes = await fetch(`/api/departments?DepartmentCoordinatorID=${user._id}`)
+                const deptRes = await fetch(`/api/departments?DepartmentCoordinatorID=${user?.id || user?._id}`)
                 const deptData = await deptRes.json()
                 if (deptData.data && deptData.data.length > 0) {
                     url = `/api/events?DepartmentID=${deptData.data[0]._id}`
@@ -66,7 +66,7 @@ export default function CoordinatorEvents() {
                     setFormData(prev => ({ ...prev, DepartmentID: deptData.data[0]._id }))
                 }
             } else if (user.role === 'event_coordinator') {
-                url = `/api/events?EventCoordinatorID=${user._id}`
+                url = `/api/events?EventCoordinatorID=${user?.id || user?._id}`
             }
 
             const response = await fetch(url)
@@ -75,7 +75,7 @@ export default function CoordinatorEvents() {
 
             // Client-side filtering for Institute Coordinator 
             if (user.role === 'institute_coordinator') {
-                const instRes = await fetch(`/api/institutes?InstituteCoordinatorID=${user._id}`)
+                const instRes = await fetch(`/api/institutes?InstituteCoordinatorID=${user?.id || user?._id}`)
                 const instData = await instRes.json()
                 if (instData.data && instData.data.length > 0) {
                     const instId = instData.data[0]._id
@@ -98,7 +98,7 @@ export default function CoordinatorEvents() {
         try {
             let url = '/api/departments'
             if (user.role === 'institute_coordinator') {
-                const instRes = await fetch(`/api/institutes?InstituteCoordinatorID=${user._id}`)
+                const instRes = await fetch(`/api/institutes?InstituteCoordinatorID=${user?.id || user?._id}`)
                 const instData = await instRes.json()
                 if (instData.data && instData.data.length > 0) {
                     url = `/api/departments?InstituteID=${instData.data[0]._id}`

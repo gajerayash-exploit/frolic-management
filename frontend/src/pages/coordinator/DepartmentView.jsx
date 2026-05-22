@@ -20,7 +20,7 @@ export default function DepartmentView() {
         const fetchData = async () => {
             try {
                 // Fetch my department
-                const deptRes = await fetch(`/api/departments?DepartmentCoordinatorID=${user._id}`)
+                const deptRes = await fetch(`/api/departments?DepartmentCoordinatorID=${user?.id || user?._id}`)
                 const deptData = await deptRes.json()
 
                 if (deptData.data && deptData.data.length > 0) {

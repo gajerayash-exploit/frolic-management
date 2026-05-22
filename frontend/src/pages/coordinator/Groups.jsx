@@ -38,13 +38,13 @@ export default function CoordinatorGroups() {
             if (user.role === 'institute_coordinator') {
                 // ... (simpler logic: get all groups for now, in real app filter by Institute)
             } else if (user.role === 'department_coordinator') {
-                const deptRes = await fetch(`/api/departments?DepartmentCoordinatorID=${user._id}`)
+                const deptRes = await fetch(`/api/departments?DepartmentCoordinatorID=${user?.id || user?._id}`)
                 const deptData = await deptRes.json()
                 if (deptData.data && deptData.data.length > 0) {
                     eventUrl = `/api/events?DepartmentID=${deptData.data[0]._id}`
                 }
             } else if (user.role === 'event_coordinator') {
-                eventUrl = `/api/events?EventCoordinatorID=${user._id}`
+                eventUrl = `/api/events?EventCoordinatorID=${user?.id || user?._id}`
             }
 
             const eventRes = await fetch(eventUrl)
