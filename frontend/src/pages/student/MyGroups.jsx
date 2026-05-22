@@ -38,7 +38,7 @@ export default function StudentMyGroups() {
             const data = await res.json()
             // Filter groups created by this user
             const myGroups = (data.data || []).filter(g =>
-                (g.CreatedBy?._id || g.CreatedBy) === user?._id
+                (g.CreatedBy?._id || g.CreatedBy) === (user?.id || user?._id)
             )
             setGroups(myGroups)
         } catch (error) {
