@@ -171,7 +171,7 @@ function MockPaymentGateway({ amount, eventName, onSuccess, onCancel }) {
                                                 onChange={(e) => setCard({ ...card, number: formatCardNumber(e.target.value) })}
                                                 placeholder="0000 0000 0000 0000"
                                                 maxLength={19}
-                                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/20 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 transition-all font-mono tracking-wider"
+                                                className="input-glass font-mono tracking-wider"
                                             />
                                             <HiOutlineCreditCard className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20" />
                                         </div>
@@ -187,7 +187,7 @@ function MockPaymentGateway({ amount, eventName, onSuccess, onCancel }) {
                                                 onChange={(e) => setCard({ ...card, expiry: formatExpiry(e.target.value) })}
                                                 placeholder="MM/YY"
                                                 maxLength={5}
-                                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/20 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 transition-all font-mono"
+                                                className="input-glass font-mono"
                                             />
                                         </div>
                                         <div>
@@ -198,7 +198,7 @@ function MockPaymentGateway({ amount, eventName, onSuccess, onCancel }) {
                                                 onChange={(e) => setCard({ ...card, cvv: e.target.value.replace(/\D/g, '').slice(0, 3) })}
                                                 placeholder="•••"
                                                 maxLength={3}
-                                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/20 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 transition-all font-mono"
+                                                className="input-glass font-mono"
                                             />
                                         </div>
                                     </div>
@@ -211,7 +211,7 @@ function MockPaymentGateway({ amount, eventName, onSuccess, onCancel }) {
                                             value={card.name}
                                             onChange={(e) => setCard({ ...card, name: e.target.value })}
                                             placeholder="Name on card"
-                                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/20 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 transition-all"
+                                            className="input-glass"
                                         />
                                     </div>
 
