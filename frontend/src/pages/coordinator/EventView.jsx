@@ -96,7 +96,7 @@ export default function EventView() {
                                     Manage Participants
                                 </Link>
                                 <Link
-                                    to={`/coordinator/events/${event._id}/attendance`}
+                                    to="/coordinator/attendance"
                                     className="flex-1 py-2 text-center rounded-lg bg-orange-500/20 text-orange-400 hover:bg-orange-500/30 transition-colors text-sm font-medium flex items-center justify-center gap-2"
                                 >
                                     <HiOutlineClipboardCheck className="w-4 h-4" />

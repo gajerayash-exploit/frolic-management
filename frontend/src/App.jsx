@@ -57,7 +57,14 @@ function App() {
                     path="/"
                     element={
                         isAuthenticated ? (
-                            <Navigate to={`/${user?.role || 'student'}`} replace />
+                            <Navigate 
+                                to={
+                                    ['institute_coordinator', 'department_coordinator', 'event_coordinator'].includes(user?.role)
+                                        ? '/coordinator'
+                                        : `/${user?.role || 'student'}`
+                                } 
+                                replace 
+                            />
                         ) : (
                             <Landing />
                         )

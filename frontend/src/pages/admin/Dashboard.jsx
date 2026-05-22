@@ -16,7 +16,8 @@ import {
     HiOutlineSparkles,
     HiOutlineCash,
     HiOutlineTrendingUp,
-    HiOutlineChartBar
+    HiOutlineChartBar,
+    HiOutlineClipboardCheck
 } from 'react-icons/hi'
 import { useState, useEffect } from 'react'
 import Institutes from './Institutes'
@@ -355,7 +356,10 @@ function DashboardHome() {
             {/* ─── Quick Actions ─────────────────────────────────── */}
             <div className="glass-card p-6">
                 <h3 className="text-lg font-semibold text-white mb-4">Quick Actions</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    <Link to="/admin/attendance" className="btn-secondary text-center text-sm font-medium bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30">
+                        Manage Attendance
+                    </Link>
                     <Link to="/admin/events" className="btn-secondary text-center text-sm">
                         New Event
                     </Link>
