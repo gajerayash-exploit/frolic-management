@@ -38,6 +38,7 @@ import PaymentStatusChart from '../../components/charts/PaymentStatusChart'
 import AttendanceChart from '../../components/charts/AttendanceChart'
 import InstituteActivityChart from '../../components/charts/InstituteActivityChart'
 import RevenueTrendChart from '../../components/charts/RevenueTrendChart'
+import GroupParticipationChart from '../../components/charts/GroupParticipationChart'
 import useDashboardData from '../../hooks/useDashboardData'
 
 const sidebarItems = [
@@ -345,11 +346,15 @@ function DashboardHome() {
                 />
             </div>
 
-            {/* ─── Charts Row 4: Institute Activity ────────────────── */}
+            {/* ─── Charts Row 4: Institute Activity + Group Participation ─ */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <InstituteActivityChart
                     data={charts.instituteActivity}
                     delay={0.6}
+                />
+                <GroupParticipationChart
+                    data={charts.groupParticipation}
+                    delay={0.65}
                 />
             </div>
 
