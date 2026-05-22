@@ -7,16 +7,16 @@ import { tooltipStyle, axisStyle, gridStyle, CHART_COLORS, GRADIENT_DEFS, defaul
 
 /**
  * GroupParticipationChart — Area chart with cumulative team participation over time.
- * @param {{ data: Array<{month: string, teams: number, cumulative: number}>, delay?: number }} props
+ * @param {{ data: Array<{month: string, teams: number, cumulative: number}>, delay?: number, className?: string }} props
  */
-export default function GroupParticipationChart({ data = [], delay = 0 }) {
+export default function GroupParticipationChart({ data = [], delay = 0, className = "" }) {
     const isEmpty = !data.length || data.every(d => d.teams === 0)
 
     return (
         <ChartCard
             title="Group Participation"
             subtitle="Teams formed over the last 6 months"
-            className="lg:col-span-2"
+            className={className}
             height={300}
             delay={delay}
         >
